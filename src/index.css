@@ -1,0 +1,13 @@
+
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+
+:root {
+  font-family: Roboto, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+*{
+  padding: 0;
+  margin: 0;
+
+}

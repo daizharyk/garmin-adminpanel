@@ -1,0 +1,13 @@
+@import "slick-carousel/slick/slick.css";
+@import "slick-carousel/slick/slick-theme.css";
+
+
+.card {
+  max-width: 345px;
+  margin: 20px;
+}
+
+.card-img {
+  height: 500px;
+  object-fit: cover;
+}
