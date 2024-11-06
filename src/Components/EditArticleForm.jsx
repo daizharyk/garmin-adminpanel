@@ -1,55 +1,70 @@
-import { Backdrop, Box, Button, Grid, Paper, TextField } from "@mui/material";
+import { Backdrop, Button, Grid, Paper, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { addArticle } from "../store/slices/articlesSlice";
 import axios from "axios";
 import { selectToken } from "../store/slices/authSlice";
-import AddImageBtn from "./addImageBtn";
 import ImageCarouselUploader from "./ImageCarouselUploader";
-import { BorderBottom } from "@mui/icons-material";
+import AddImageBtn from "./addImageBtn";
 
 const EditArticleForm = ({ onClose }) => {
   const token = useSelector(selectToken);
-  const dispatch = useDispatch();
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
-  // Состояние для хранения файлов и их превью с разными ключами
-  const [files, setFiles] = useState({
-    carouselImage: [],
-    bannerImage: { file: null, preview: null },
+  const [previewImage, setPreviewImage] = useState(null);
+  const [carouselImages, setCarouselImages] = useState([]);
+  const [bannerImage, setBannerImage] = useState({
+    main: null,
+    adaptive: null,
   });
-  const onFilesChange = (newFiles) => {
-    setFiles((prevFiles) => ({
-      ...prevFiles,
-      carouselImage: newFiles,
-    }));
-  };
+  const [videoSection, setVideoSection] = useState({
+    thumbnail: null,
+  });
+  const [additionalImages, setAdditionalImages] = useState({
+    addition_main: null,
+    addition_adaptive: null,
+  });
+  const dispatch = useDispatch();
 
   const onSaveHandler = async (data) => {
     try {
       const formData = new FormData();
+      carouselImages.forEach((file) => {
+        formData.append("carouselImages", file.file); // Каждый файл в массив
+      });
+
+      if (bannerImage.main) {
+        formData.append("mainBanner", bannerImage.main);
+      }
+
+      if (bannerImage.adaptive) {
+        formData.append("adaptiveBanner", bannerImage.adaptive);
+      }
+
+
+      if (videoSection.thumbnail) {
+        formData.append("videoThumbnail", videoSection.thumbnail);
+      }
+
+ 
+      if (additionalImages.addition_main) {
+        formData.append("mainAdditionImg", additionalImages.addition_main);
+      }
+
+      if (additionalImages.addition_adaptive) {
+        formData.append("adaptiveAdditionImg", additionalImages.addition_adaptive);
+      }
+
       formData.append("name", data.name);
       formData.append("price", data.price);
       formData.append("color", data.color);
-      console.log("Отправляемые данные:", ...formData.entries());
-      files.carouselImage.forEach((file) => {
-        formData.append("carouselImages", file.file);
-      });
-      if (files.bannerImage.file) {
-        formData.append("bannerImage", files.bannerImage.file);
-      }
+      formData.append("status", data.status);
 
-      if (!token) {
-        console.log("Токен не найден. Пожалуйста, войдите в систему.");
-        return;
-      }
-
+     
       const response = await axios.post(
         "http://localhost:3005/api/items",
         formData,
@@ -60,7 +75,6 @@ const EditArticleForm = ({ onClose }) => {
           },
         }
       );
-
       dispatch(addArticle(response.data));
       onClose();
     } catch (error) {
@@ -68,51 +82,50 @@ const EditArticleForm = ({ onClose }) => {
     }
   };
 
-  const handleFileChange = (file, key) => {
-    if (file) {
-      const preview = URL.createObjectURL(file);
-      setFiles((prevFiles) => ({
-        ...prevFiles,
-        [key]: { file, preview },
-      }));
-    } else {
-      setFiles((prevFiles) => ({
-        ...prevFiles,
-        [key]: null,
-      }));
-    }
-    const inputElement = document.getElementById(`fileInput-${key}`);
-    if (inputElement) {
-      inputElement.value = "";
-    }
+  const handleFilesChange = (files) => {
+    setCarouselImages(files); // Обновляем состояние файлов карусели
   };
-  useEffect(() => {
-    // Освобождаем ресурсы для всех изображений
-    return () => {
-      Object.values(files).forEach((file) => {
-        if (file && file.preview) {
-          URL.revokeObjectURL(file.preview);
-        }
-      });
-    };
-  }, [files]);
 
+  const handleBannerFileChange = (file, fileKey) => {
+    setBannerImage((prevState) => ({
+      ...prevState,
+      [fileKey]: file,
+    }));
+  };
+
+  const handleVideoThumbnailChange = (file) => {
+    setVideoSection((prevState) => ({
+      ...prevState,
+      thumbnail: file,
+    }));
+  };
+  const handleAdditionFileChange = (file, fileKey) => {
+    setAdditionalImages((prevState) => ({
+      ...prevState,
+      [fileKey]: file,
+    }));
+  };
+
+  useEffect(() => {
+    return () => {
+      if (previewImage) URL.revokeObjectURL(previewImage);
+    };
+  }, [previewImage]);
   return (
     <Backdrop open={true} onClick={onClose} sx={{ zIndex: 1000 }}>
       <Paper
         sx={{
-          p: 5,
+          p: 4,
           borderRadius: "0",
-          maxHeight: "75vh",
-          maxWidth: "90vw",
-          overflow: "auto",
+          maxHeight: "80vh",
+          overflowY: "auto",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit(onSaveHandler)}>
           <Grid container spacing={4}>
             <Grid item xs={12} md={6}>
-              <ImageCarouselUploader onFilesChange={onFilesChange} />
+              <ImageCarouselUploader onFilesChange={handleFilesChange} />
             </Grid>
             <Grid item xs={12} md={6}>
               <Grid
@@ -186,41 +199,78 @@ const EditArticleForm = ({ onClose }) => {
               </Grid>
             </Grid>
           </Grid>
-          <Grid
-            container
-            item
-            sx={{
-              width: "100%",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Grid item sx={{ width: "100% " }}>
-              <AddImageBtn
-                register={register}
-                previewImage={
-                  files.carouselImage ? files.carouselImage.preview : null
-                }
-                onFileChange={(file) => handleFileChange(file, "carouselImage")}
-                fileKey="carouselImage"
-              />
-            </Grid>
+
+          <Grid item xs={12}>
+            <AddImageBtn
+              register={register}
+              onFileChange={handleBannerFileChange}
+              previewImage={
+                bannerImage?.main ? URL.createObjectURL(bannerImage.main) : ""
+              }
+              fileKey="main"
+              containerStyle={{ width: "100%" }}
+              buttonStyle={{ width: "100%" }}
+            />
           </Grid>
-          <Grid item marginTop={"50px"}>
-            <Button
-              sx={{
-                backgroundColor: "#000",
-                border: "none",
-                color: "#fff",
-                borderRadius: "0",
-                "&:hover": {
-                  backgroundColor: "#fff",
-                  color: "#000",
-                },
-              }}
-              type={"submit"}
-              variant="contained"
-            >
+          <Grid item xs={12}>
+            <AddImageBtn
+              register={register}
+              onFileChange={handleBannerFileChange}
+              previewImage={
+                bannerImage.adaptive
+                  ? URL.createObjectURL(bannerImage.adaptive)
+                  : ""
+              }
+              fileKey="adaptive"
+              containerStyle={{ width: "100%" }}
+              buttonStyle={{ width: "100%" }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <AddImageBtn
+              register={register}
+              onFileChange={handleVideoThumbnailChange}
+              previewImage={
+                videoSection.thumbnail
+                  ? URL.createObjectURL(videoSection.thumbnail)
+                  : ""
+              }
+              fileKey="thumbnail"
+              containerStyle={{ width: "100%" }}
+              buttonStyle={{ width: "100%" }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <AddImageBtn
+              register={register}
+              onFileChange={handleAdditionFileChange}
+              previewImage={
+                additionalImages?.addition_main
+                  ? URL.createObjectURL(additionalImages.addition_main)
+                  : ""
+              }
+              fileKey="addition_main"
+              containerStyle={{ width: "100%" }}
+              buttonStyle={{ width: "100%" }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <AddImageBtn
+              register={register}
+              onFileChange={handleAdditionFileChange}
+              previewImage={
+                additionalImages?.addition_adaptive
+                  ? URL.createObjectURL(additionalImages.addition_adaptive)
+                  : ""
+              }
+              fileKey="addition_adaptive"
+              containerStyle={{ width: "100%" }}
+              buttonStyle={{ width: "100%" }}
+            />
+          </Grid>
+
+          <Grid item>
+            <Button type={"submit"} variant="contained">
               Save
             </Button>
           </Grid>

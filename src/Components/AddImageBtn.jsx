@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Grid } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 
@@ -12,7 +12,7 @@ const AddImageBtn = ({
   previewStyle = {},
 }) => {
   const [fileName, setFileName] = useState("");
-
+  const fileInputRef = useRef(null); 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -23,7 +23,9 @@ const AddImageBtn = ({
 
   const handleFileRemove = () => {
     setFileName("");
-
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Сбрасываем значение поля input
+    }
     onFileChange(null, fileKey); // Удаляем файл из родительского компонента
   };
 
@@ -31,13 +33,14 @@ const AddImageBtn = ({
     <Grid
       sx={{ ...containerStyle }}
       item
-      xs={12} md={6}
+      xs={12}
+      md={6}
       display="flex"
       flexDirection="column"
       alignItems="flex-start"
     >
       {previewImage && (
-        <Grid 
+        <Grid
           item
           sx={{
             ...previewStyle,
@@ -46,11 +49,11 @@ const AddImageBtn = ({
             width: "100%",
           }}
         >
-          <Button  
+          <Button
             variant="outlined"
             color="error"
             onClick={handleFileRemove}
-            sx={{ 
+            sx={{
               position: "absolute",
               bottom: "20px",
               left: "50%",
@@ -68,7 +71,7 @@ const AddImageBtn = ({
           >
             Delete
           </Button>
-          <img 
+          <img
             src={previewImage}
             alt="Preview"
             style={{
@@ -78,24 +81,19 @@ const AddImageBtn = ({
           />
         </Grid>
       )}
-      <Grid
-        item
-        display={"flex"}
-        justifyContent={"center"}
-      
-      >
+      <Grid item display={"flex"} justifyContent={"center"}>
         <input
           type="file"
           id={`fileInput-${fileKey}`}
           {...register(fileKey)}
           onChange={handleFileChange}
           style={{ display: "none" }}
+          ref={fileInputRef} 
         />
-        <Button 
+        <Button
           variant="contained"
           component="span"
           sx={{
-            
             backgroundColor: "#fff",
             border: "none",
             color: "#000",

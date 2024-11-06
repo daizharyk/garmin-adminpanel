@@ -16,14 +16,25 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
+    console.log(selectedFiles);
+    
     const newFiles = selectedFiles.map((file) => ({
+    
       file,
       preview: URL.createObjectURL(file),
+     
     }));
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    console.log("newFiles",newFiles);
+  
+    setFiles((prevFiles) => {
+      const updatedFiles = [...prevFiles, ...newFiles];
+      onFilesChange(updatedFiles); // Передаем обновленные файлы в родительский компонент
+      return updatedFiles;
+    });
     setImagesSelected(true);
     e.target.value = null;
   };
+
 
   const handleSelectImage = (index) => {
     setSelectedIndexes((prevSelected) =>
@@ -46,6 +57,7 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
     setSelectedIndexes([]);
 
     setImagesSelected(newFiles.length > 0);
+    onFilesChange(newFiles);
   };
   const handleSelectAllImages = () => {
     if (selectedIndexes.length === files.length) {
@@ -71,7 +83,7 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
         }
         sx={{
           boxSizing: "border-box",
-         marginBottom:"20px",
+          marginBottom: "20px",
           color: "#fff",
           backgroundColor: "#000",
           borderRadius: "0",
@@ -91,61 +103,60 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
       >
         Upload Carousel Images
       </Button>
-      
-        {files.length > 0 && (
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={handleSelectAllImages}
-            sx={{
-              margin:"0 10px 10px 0",
-              boxSizing: "border-box",
-              marginRight:"10px",
-              color: "#fff",
-              backgroundColor: "#000",
-              borderRadius: "0",
+
+      {files.length > 0 && (
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={handleSelectAllImages}
+          sx={{
+            margin: "0 10px 10px 0",
+            boxSizing: "border-box",
+            marginRight: "10px",
+            color: "#fff",
+            backgroundColor: "#000",
+            borderRadius: "0",
+            boxShadow: "none",
+            overflow: "hidden",
+            "&:hover": {
+              outline: "1px solid #000",
+              transition: "color 0.2s",
+              backgroundColor: "#fff",
               boxShadow: "none",
-              overflow: "hidden",
-              "&:hover": {
-                outline: "1px solid #000",
-                transition: "color 0.2s",
-                backgroundColor: "#fff",
-                boxShadow: "none",
-                color: "#000",
-              },
-            }}
-          >
-            {selectedIndexes.length === files.length
-              ? "Deselect All"
-              : "Select All"}
-          </Button>
-        )}
-        {selectedIndexes.length > 0 && (
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleRemoveSelectedImages}
-            sx={{
-              margin:"0 10px 10px 0",
-              color: "#fff",
-              backgroundColor: "#000",
-              borderRadius: "0",
+              color: "#000",
+            },
+          }}
+        >
+          {selectedIndexes.length === files.length
+            ? "Deselect All"
+            : "Select All"}
+        </Button>
+      )}
+      {selectedIndexes.length > 0 && (
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleRemoveSelectedImages}
+          sx={{
+            margin: "0 10px 10px 0",
+            color: "#fff",
+            backgroundColor: "#000",
+            borderRadius: "0",
+            boxShadow: "none",
+            overflow: "hidden",
+            "&:hover": {
+              outline: "1px solid #000",
+              transition: "color 0.2s",
+              backgroundColor: "#fff",
               boxShadow: "none",
-              overflow: "hidden",
-              "&:hover": {
-                outline: "1px solid #000",
-                transition: "color 0.2s",
-                backgroundColor: "#fff",
-                boxShadow: "none",
-                color: "#000",
-              },
-            }}
-            startIcon={<DeleteIcon />}
-          >
-            Remove Selected Images
-          </Button>
-        )}
-   
+              color: "#000",
+            },
+          }}
+          startIcon={<DeleteIcon />}
+        >
+          Remove Selected Images
+        </Button>
+      )}
 
       <Grid container spacing={2}>
         {files.map((img, index) => (
@@ -159,7 +170,6 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
                   width: "100%",
                   height: "100%",
                   zIndex: 1,
-                  
                 }}
                 onClick={() => handleSelectImage(index)}
               >
@@ -170,14 +180,13 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
                     top: "8px",
                     left: "8px",
                     pointerEvents: "none",
-                   
                   }}
                 />
               </div>
               <CardMedia
-              sx={{
-                borderRadius:"0"
-              }}
+                sx={{
+                  borderRadius: "0",
+                }}
                 component="img"
                 height="140"
                 image={img.preview}
