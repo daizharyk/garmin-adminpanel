@@ -1,4 +1,4 @@
-import { Backdrop, Button, Grid, Paper, TextField } from "@mui/material";
+import { Backdrop, Box, Button, Grid, Paper, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,18 +45,19 @@ const EditArticleForm = ({ onClose }) => {
         formData.append("adaptiveBanner", bannerImage.adaptive);
       }
 
-
       if (videoSection.thumbnail) {
         formData.append("videoThumbnail", videoSection.thumbnail);
       }
 
- 
       if (additionalImages.addition_main) {
         formData.append("mainAdditionImg", additionalImages.addition_main);
       }
 
       if (additionalImages.addition_adaptive) {
-        formData.append("adaptiveAdditionImg", additionalImages.addition_adaptive);
+        formData.append(
+          "adaptiveAdditionImg",
+          additionalImages.addition_adaptive
+        );
       }
 
       formData.append("name", data.name);
@@ -64,7 +65,6 @@ const EditArticleForm = ({ onClose }) => {
       formData.append("color", data.color);
       formData.append("status", data.status);
 
-     
       const response = await axios.post(
         "http://localhost:3005/api/items",
         formData,
@@ -123,7 +123,14 @@ const EditArticleForm = ({ onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit(onSaveHandler)}>
-          <Grid container spacing={4}>
+          <Grid
+            container
+            spacing={4}
+            sx={{
+              borderBottom: "1px solid #ccc",
+              paddingBottom: 2,
+            }}
+          >
             <Grid item xs={12} md={6}>
               <ImageCarouselUploader onFilesChange={handleFilesChange} />
             </Grid>
@@ -200,73 +207,78 @@ const EditArticleForm = ({ onClose }) => {
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
-            <AddImageBtn
-              register={register}
-              onFileChange={handleBannerFileChange}
-              previewImage={
-                bannerImage?.main ? URL.createObjectURL(bannerImage.main) : ""
-              }
-              fileKey="main"
-              containerStyle={{ width: "100%" }}
-              buttonStyle={{ width: "100%" }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <AddImageBtn
-              register={register}
-              onFileChange={handleBannerFileChange}
-              previewImage={
-                bannerImage.adaptive
-                  ? URL.createObjectURL(bannerImage.adaptive)
-                  : ""
-              }
-              fileKey="adaptive"
-              containerStyle={{ width: "100%" }}
-              buttonStyle={{ width: "100%" }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <AddImageBtn
-              register={register}
-              onFileChange={handleVideoThumbnailChange}
-              previewImage={
-                videoSection.thumbnail
-                  ? URL.createObjectURL(videoSection.thumbnail)
-                  : ""
-              }
-              fileKey="thumbnail"
-              containerStyle={{ width: "100%" }}
-              buttonStyle={{ width: "100%" }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <AddImageBtn
-              register={register}
-              onFileChange={handleAdditionFileChange}
-              previewImage={
-                additionalImages?.addition_main
-                  ? URL.createObjectURL(additionalImages.addition_main)
-                  : ""
-              }
-              fileKey="addition_main"
-              containerStyle={{ width: "100%" }}
-              buttonStyle={{ width: "100%" }}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <AddImageBtn
-              register={register}
-              onFileChange={handleAdditionFileChange}
-              previewImage={
-                additionalImages?.addition_adaptive
-                  ? URL.createObjectURL(additionalImages.addition_adaptive)
-                  : ""
-              }
-              fileKey="addition_adaptive"
-              containerStyle={{ width: "100%" }}
-              buttonStyle={{ width: "100%" }}
-            />
+          <AddImageBtn
+            register={register}
+            onFileChange={handleBannerFileChange}
+            previewImage={
+              bannerImage?.main ? URL.createObjectURL(bannerImage.main) : ""
+            }
+            fileKey="main"
+            containerStyle={{}} // Кнопка занимает весь квадрат
+            buttonStyle={{}}
+            buttonText="Upload Main Banner image"
+          />
+
+          <AddImageBtn
+            register={register}
+            onFileChange={handleBannerFileChange}
+            previewImage={
+              bannerImage?.adaptive
+                ? URL.createObjectURL(bannerImage.adaptive)
+                : ""
+            }
+            fileKey="adaptive"ъ
+            containerStyle={{ width: "100%", height: "100%" }}
+            buttonStyle={{ width: "100%", height: "100%" }}
+            buttonText="Upload Adaptive Banner image"
+          />
+
+          <Grid container width={"100%"}>
+            <Grid item xs={12}>
+              <AddImageBtn
+                register={register}
+                onFileChange={handleVideoThumbnailChange}
+                previewImage={
+                  videoSection.thumbnail
+                    ? URL.createObjectURL(videoSection.thumbnail)
+                    : ""
+                }
+                fileKey="thumbnail"
+                containerStyle={{ width: "100%" }}
+                buttonStyle={{ width: "100%" }}
+                buttonText="Upload an image for your video player's screensaver"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <AddImageBtn
+                register={register}
+                onFileChange={handleAdditionFileChange}
+                previewImage={
+                  additionalImages?.addition_main
+                    ? URL.createObjectURL(additionalImages.addition_main)
+                    : ""
+                }
+                fileKey="addition_main"
+                containerStyle={{ width: "100%" }}
+                buttonStyle={{ width: "100%" }}
+                buttonText="Upload an additional main image"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <AddImageBtn
+                register={register}
+                onFileChange={handleAdditionFileChange}
+                previewImage={
+                  additionalImages?.addition_adaptive
+                    ? URL.createObjectURL(additionalImages.addition_adaptive)
+                    : ""
+                }
+                fileKey="addition_adaptive"
+                containerStyle={{ width: "100%" }}
+                buttonStyle={{ width: "100%" }}
+                buttonText="Upload an additional adaptive image"
+              />
+            </Grid>
           </Grid>
 
           <Grid item>

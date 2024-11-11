@@ -6,13 +6,14 @@ const AddImageBtn = ({
   register,
   onFileChange,
   previewImage,
+  buttonText,
   fileKey,
   containerStyle = {},
   buttonStyle = {},
   previewStyle = {},
 }) => {
   const [fileName, setFileName] = useState("");
-  const fileInputRef = useRef(null); 
+  const fileInputRef = useRef(null);
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -72,28 +73,32 @@ const AddImageBtn = ({
             Delete
           </Button>
           <img
+            xs={12}
+            md={6}
             src={previewImage}
             alt="Preview"
             style={{
-              maxHeight: "350px",
+              
               objectFit: "contain",
+              width: "100%",
             }}
           />
         </Grid>
       )}
-      <Grid item display={"flex"} justifyContent={"center"}>
+      <Grid item display={"flex"} width={"100%"} justifyContent={"center"}>
         <input
           type="file"
           id={`fileInput-${fileKey}`}
           {...register(fileKey)}
           onChange={handleFileChange}
           style={{ display: "none" }}
-          ref={fileInputRef} 
+          ref={fileInputRef}
         />
         <Button
           variant="contained"
           component="span"
           sx={{
+            width: "100%",
             backgroundColor: "#fff",
             border: "none",
             color: "#000",
@@ -115,7 +120,7 @@ const AddImageBtn = ({
                   fileName.lastIndexOf(".")
                 )}`
               : fileName
-            : "select picture"}
+            : buttonText || "Select picture"}
         </Button>
       </Grid>
     </Grid>

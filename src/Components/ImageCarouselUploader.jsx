@@ -17,15 +17,13 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     console.log(selectedFiles);
-    
+
     const newFiles = selectedFiles.map((file) => ({
-    
       file,
       preview: URL.createObjectURL(file),
-     
     }));
-    console.log("newFiles",newFiles);
-  
+    console.log("newFiles", newFiles);
+
     setFiles((prevFiles) => {
       const updatedFiles = [...prevFiles, ...newFiles];
       onFilesChange(updatedFiles); // Передаем обновленные файлы в родительский компонент
@@ -34,7 +32,6 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
     setImagesSelected(true);
     e.target.value = null;
   };
-
 
   const handleSelectImage = (index) => {
     setSelectedIndexes((prevSelected) =>
@@ -101,7 +98,7 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
           },
         }}
       >
-        Upload Carousel Images
+        {imagesSelected ? "Add Images" : "Upload Carousel Images"}
       </Button>
 
       {files.length > 0 && (
@@ -158,10 +155,17 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
         </Button>
       )}
 
-      <Grid container spacing={2}>
+      <Grid container spacing={1}>
         {files.map((img, index) => (
-          <Grid item xs={6} sm={4} md={3} key={index}>
-            <Card style={{ position: "relative" }}>
+          <Grid item xs={3} sm={2} md={2} key={index}>
+            <Card
+              style={{
+             
+                position: "relative",
+                maxWidth: "100%", // задаем меньшую ширину
+                
+              }}
+            >
               <div
                 style={{
                   position: "absolute",
@@ -177,8 +181,6 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
                   checked={selectedIndexes.includes(index)}
                   style={{
                     position: "absolute",
-                    top: "8px",
-                    left: "8px",
                     pointerEvents: "none",
                   }}
                 />
@@ -186,20 +188,15 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
               <CardMedia
                 sx={{
                   borderRadius: "0",
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
                 }}
                 component="img"
-                height="140"
+                height="100%"
                 image={img.preview}
                 alt={`Carousel ${index}`}
               />
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                align="center"
-                style={{ padding: "8px" }}
-              >
-                Image {index + 1}
-              </Typography>
             </Card>
           </Grid>
         ))}
