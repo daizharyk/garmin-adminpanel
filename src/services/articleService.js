@@ -1,4 +1,4 @@
-import axios from "axios";
+
 import { getRequest, postRequest } from "./service";
 
 const API_URL = "items";
@@ -20,4 +20,3 @@ export async function addArticle(data) {
   const article = await postRequest(`${API_URL}/`, data);
   return article;
 }
-

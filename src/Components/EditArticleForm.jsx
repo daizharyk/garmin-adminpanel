@@ -28,9 +28,11 @@ const EditArticleForm = ({ onClose }) => {
     addition_main: null,
     addition_adaptive: null,
   });
+
   const dispatch = useDispatch();
 
   const onSaveHandler = async (data) => {
+    console.log("data", data);
     try {
       const formData = new FormData();
       carouselImages.forEach((file) => {
@@ -64,6 +66,8 @@ const EditArticleForm = ({ onClose }) => {
       formData.append("price", data.price);
       formData.append("color", data.color);
       formData.append("status", data.status);
+      formData.append("banner_title", data.banner_text.title);
+      formData.append("banner_text", data.banner_text.text);
 
       const response = await axios.post(
         "http://localhost:3005/api/items",
@@ -127,7 +131,6 @@ const EditArticleForm = ({ onClose }) => {
             container
             spacing={4}
             sx={{
-              borderBottom: "1px solid #ccc",
               paddingBottom: 2,
             }}
           >
@@ -206,34 +209,123 @@ const EditArticleForm = ({ onClose }) => {
               </Grid>
             </Grid>
           </Grid>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              backgroundColor:"#edf2f4",
+              padding: "16px",
+              marginBottom: "20px",
+            }}
+          >
+            <Grid item margin={"10px 0"}>
+              <AddImageBtn
+                register={register}
+                onFileChange={handleBannerFileChange}
+                previewImage={
+                  bannerImage?.main ? URL.createObjectURL(bannerImage.main) : ""
+                }
+                fileKey="main"
+                containerStyle={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  justifyContent: "space-between", // Распределяем контент равномерно
+                  height: "100%",
+                }}
+                buttonStyle={{
+                  width: "100%",
+                  height: bannerImage?.main ? "60px" : "150px",
+                }}
+                buttonText="Upload Main Banner image"
+              />
+            </Grid>
+            <Grid item margin={"10px 0"}>
+              <AddImageBtn
+                register={register}
+                onFileChange={handleBannerFileChange}
+                previewImage={
+                  bannerImage?.adaptive
+                    ? URL.createObjectURL(bannerImage.adaptive)
+                    : ""
+                }
+                fileKey="adaptive"
+                ъ
+                containerStyle={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
 
-          <AddImageBtn
-            register={register}
-            onFileChange={handleBannerFileChange}
-            previewImage={
-              bannerImage?.main ? URL.createObjectURL(bannerImage.main) : ""
-            }
-            fileKey="main"
-            containerStyle={{}} // Кнопка занимает весь квадрат
-            buttonStyle={{}}
-            buttonText="Upload Main Banner image"
-          />
+                  justifyContent: "space-between", // Распределяем контент равномерно
+                  height: "100%",
+                }}
+                buttonStyle={{
+                  width: "100%",
+                  height: bannerImage?.adaptive ? "60px" : "150px",
+                }}
+                buttonText="Upload Adaptive Banner image"
+              />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <Grid
+                container
+                spacing={2}
+                sx={{
+                  width: "100%",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 0,
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "black",
+                    },
+                  },
+                }}
+              >
+                <Grid item width={"100%"}>
+                  <TextField
+                    label="Banner title"
+                    type="text"
+                    sx={{ width: "100%",backgroundColor:"#fff" }}
+                    {...register("banner_text.title")}
+                    error={!!errors.banner_text?.title}
+                    helperText={errors.banner_text?.title?.message}
+                  />
+                </Grid>
 
-          <AddImageBtn
-            register={register}
-            onFileChange={handleBannerFileChange}
-            previewImage={
-              bannerImage?.adaptive
-                ? URL.createObjectURL(bannerImage.adaptive)
-                : ""
-            }
-            fileKey="adaptive"ъ
-            containerStyle={{ width: "100%", height: "100%" }}
-            buttonStyle={{ width: "100%", height: "100%" }}
-            buttonText="Upload Adaptive Banner image"
-          />
-
-          <Grid container width={"100%"}>
+                <Grid item width={"100%"}>
+                  <TextField
+                    label="Banner text"
+                    type="text"
+                    sx={{ width: "100%" ,backgroundColor:"#fff"}}
+                    {...register("banner_text.text")}
+                    error={!!errors.banner_text?.text}
+                    helperText={errors.banner_text?.text?.message}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              backgroundColor:"#edf2f4",
+              padding: "16px",
+              marginBottom: "20px",
+            }}
+          >
             <Grid item xs={12}>
               <AddImageBtn
                 register={register}
@@ -245,10 +337,40 @@ const EditArticleForm = ({ onClose }) => {
                 }
                 fileKey="thumbnail"
                 containerStyle={{ width: "100%" }}
-                buttonStyle={{ width: "100%" }}
-                buttonText="Upload an image for your video player's screensaver"
+                buttonStyle={{
+                  width: "100%",
+                  height: videoSection?.thumbnail ? "60px" : "150px",
+                }}
+                buttonText="Upload player cover"
               />
             </Grid>
+            <Grid item width={"100%"}>
+              <TextField
+                label="Link to video"
+                type="text"
+                sx={{ width: "100%",
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 0,
+                    "&:hover fieldset": {
+                      borderColor: "black",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "black",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "black",
+                    },
+                  },width: "100%" , backgroundColor:"#fff"}}
+                {...register("banner_text.text")}
+                error={!!errors.banner_text?.text}
+                helperText={errors.banner_text?.text?.message}
+              />
+            </Grid>
+          </Grid>
+
+          <Grid container width={"100%"}>
             <Grid item xs={12}>
               <AddImageBtn
                 register={register}

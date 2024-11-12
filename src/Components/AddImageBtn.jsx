@@ -38,7 +38,8 @@ const AddImageBtn = ({
       md={6}
       display="flex"
       flexDirection="column"
-      alignItems="flex-start"
+      alignItems="center"
+      marginBottom={"10px"}
     >
       {previewImage && (
         <Grid
@@ -80,7 +81,7 @@ const AddImageBtn = ({
             style={{
               
               objectFit: "contain",
-              width: "100%",
+              width: "350px",
             }}
           />
         </Grid>
