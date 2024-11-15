@@ -1,12 +1,5 @@
 import React, { useState } from "react";
-import {
-  Button,
-  Grid,
-  Card,
-  CardMedia,
-  Typography,
-  Checkbox,
-} from "@mui/material";
+import { Button, Grid, Card, CardMedia, Checkbox } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
 const ImageCarouselUploader = ({ onFilesChange }) => {
@@ -160,10 +153,8 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
           <Grid item xs={3} sm={2} md={2} key={index}>
             <Card
               style={{
-             
                 position: "relative",
-                maxWidth: "100%", // задаем меньшую ширину
-                
+                maxWidth: "100%", 
               }}
             >
               <div
