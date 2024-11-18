@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {  useRef, useState } from "react";
 import { Button, Grid } from "@mui/material";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 
@@ -46,44 +46,41 @@ const AddImageBtn = ({
           item
           sx={{
             ...previewStyle,
-            position: "relative",
-            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+
             width: "100%",
           }}
         >
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleFileRemove}
-            sx={{
-              position: "absolute",
-              bottom: "20px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              zIndex: 1,
-              backgroundColor: "#fff",
-              border: "none",
-              color: "#000",
-              borderRadius: "0",
-              "&:hover": {
-                backgroundColor: "#c1121f",
-                color: "#fff",
-              },
-            }}
-          >
-            Delete
-          </Button>
           <img
             xs={12}
             md={6}
             src={previewImage}
             alt="Preview"
             style={{
-              
               objectFit: "contain",
-              width: "350px",
+              width: "450px",
+              height: "auto",
+              maxWidth: "100%",
             }}
           />
+          <Button
+            variant="outlined"
+            onClick={handleFileRemove}
+            sx={{
+              margin: "10px 0",
+              backgroundColor: "#000",
+              border: "none",
+              color: "#fff",
+              borderRadius: "0",
+              "&:hover": { backgroundColor: "#c1121f", color: "#fff" },
+              marginBottom: "10px",
+            }}
+          >
+            Delete
+          </Button>
         </Grid>
       )}
       <Grid item display={"flex"} width={"100%"} justifyContent={"center"}>
@@ -112,16 +109,10 @@ const AddImageBtn = ({
           }}
           onClick={() =>
             document.getElementById(`fileInput-${fileKey}`).click()
-          } // открываем диалог выбора файла
+          }
         >
           <AttachFileIcon sx={{ marginRight: 1 }} />
-          {fileName
-            ? fileName.length > 15
-              ? `${fileName.slice(0, 10)}...${fileName.slice(
-                  fileName.lastIndexOf(".")
-                )}`
-              : fileName
-            : buttonText || "Select picture"}
+          {buttonText}
         </Button>
       </Grid>
     </Grid>

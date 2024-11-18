@@ -17,7 +17,7 @@ const AllArticles = () => {
   }, []);
 
   return (
-    <PageWrapper title={"All Items"}>
+    <PageWrapper title={"All products"}>
       {loading && <Spinner />}
       <ArticleList items={allArticles} />
     </PageWrapper>

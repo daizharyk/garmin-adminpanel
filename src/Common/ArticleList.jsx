@@ -1,9 +1,9 @@
 import React from "react";
-import Article from "../Components/ArticleCard";
+
 import { Grid } from "@mui/material";
 import ArticleCard from "../Components/ArticleCard";
 
-const ArticleList = ({ items }) => {
+const ArticleList = ({ items, isEdited }) => {
   if (!items || !Array.isArray(items)) {
     return <p>No articles available</p>; // Вариант отображения, если нет данных
   }
@@ -19,6 +19,15 @@ const ArticleList = ({ items }) => {
               image={article.image}
               price={article.price}
               status={article.status}
+              color={article.color}
+              banner_title={article.banner_title}
+              banner_text={article.banner_text}
+              video_url={article.video_url}
+              watch_features={article.watch_features}
+              isEdited={isEdited}
+              video_section={article.video_section}
+              additional_images={article.additional_images}
+              carousel_images={article.carousel_images}
             />
           </Grid>
         );

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import Layout from "./Components/layout";
+import Layout from "./Components/Layout";
 import { Provider } from "react-redux";
 import {store} from "./store"
 

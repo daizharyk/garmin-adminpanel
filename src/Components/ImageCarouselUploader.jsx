@@ -1,25 +1,40 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Grid, Card, CardMedia, Checkbox } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
-const ImageCarouselUploader = ({ onFilesChange }) => {
+const ImageCarouselUploader = ({ article, onFilesChange, imageUrls = [] }) => {
   const [files, setFiles] = useState([]);
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [imagesSelected, setImagesSelected] = useState(false);
 
+  useEffect(() => {
+    const initialFiles = imageUrls.map((url) => ({
+      preview: url, // URL изображения
+      file: null, // Это URL, а не локальный файл
+    }));
+    setFiles((prevFiles) => [
+      ...prevFiles.filter((item) => item.file === null || item.file),
+      ...initialFiles,
+    ]);
+    console.log("Initial Files:", initialFiles);
+  }, [imageUrls]);
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    console.log(selectedFiles);
+    console.log("selectedFiles", selectedFiles);
 
     const newFiles = selectedFiles.map((file) => ({
       file,
-      preview: URL.createObjectURL(file),
+      preview: URL.createObjectURL(file), // Создаем URL для превью
     }));
-    console.log("newFiles", newFiles);
 
+    // Добавляем новые файлы без вложенности
     setFiles((prevFiles) => {
-      const updatedFiles = [...prevFiles, ...newFiles];
-      onFilesChange(updatedFiles); // Передаем обновленные файлы в родительский компонент
+      const updatedFiles = [
+        ...prevFiles.filter((item) => item.file === null || item.file), // Убедимся, что не добавляем вложенные объекты
+        ...newFiles,
+      ];
+      onFilesChange(updatedFiles);
       return updatedFiles;
     });
     setImagesSelected(true);
@@ -39,7 +54,11 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
       (_, index) => !selectedIndexes.includes(index)
     );
     selectedIndexes.forEach((index) => {
-      if (files[index] && files[index].preview) {
+      if (
+        files[index] &&
+        files[index].preview &&
+        files[index].file instanceof Blob
+      ) {
         URL.revokeObjectURL(files[index].preview);
       }
     });
@@ -154,7 +173,7 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
             <Card
               style={{
                 position: "relative",
-                maxWidth: "100%", 
+                maxWidth: "100%",
               }}
             >
               <div
@@ -185,7 +204,9 @@ const ImageCarouselUploader = ({ onFilesChange }) => {
                 }}
                 component="img"
                 height="100%"
-                image={img.preview}
+                image={
+                  img.preview || (img.file && URL.createObjectURL(img.file))
+                }
                 alt={`Carousel ${index}`}
               />
             </Card>

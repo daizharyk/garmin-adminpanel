@@ -17,13 +17,16 @@ import { selectToken } from "../store/slices/authSlice";
 import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./addImageBtn";
 
-const EditArticleForm = ({ onClose }) => {
+const EditArticleForm = ({ onClose, article }) => {
   const token = useSelector(selectToken);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    getValues,
   } = useForm();
+
   const [previewImage, setPreviewImage] = useState(null);
   const [carouselImages, setCarouselImages] = useState([]);
   const [bannerImage, setBannerImage] = useState({
@@ -42,7 +45,63 @@ const EditArticleForm = ({ onClose }) => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (article) {
+      console.log("Article data before setting values:", article);
+      setValue("name", article.name || "");
+      setValue("price", article.price || 0);
+      setValue("color", article.color || "");
+      setValue("status", article.status || "");
+
+      if (article.carousel_images) {
+        setCarouselImages(article.carousel_images || []);
+        console.log(
+          "Carousel Images after setting:",
+          article.carousel_images || []
+        );
+      }
+      if (article.banner_text) {
+        setValue("banner_text.title", article.banner_text.title || "");
+        setValue("banner_text.text", article.banner_text.text || "");
+        setBannerImage({
+          main: article.banner_text.banner_images?.main_banner || null,
+          adaptive: article.banner_text.banner_images?.adaptive_banner || null,
+        });
+        console.log("Banner Text after setting:", getValues("banner_text"));
+        console.log("Banner Images after setting:", {
+          main: article.banner_text.banner_images?.main_banner || null,
+          adaptive: article.banner_text.banner_images?.adaptive_banner || null,
+        });
+      }
+
+      setWatchFeatures(article.watch_features || []);
+
+      if (article.video_section) {
+        setValue(
+          "video_section.video_url",
+          article.video_section.video_url || ""
+        );
+        setVideoSection({
+          thumbnail: article.video_section.thumbnail || null,
+          video_url: article.video_section.video_url || "",
+        });
+      }
+
+      if (article.additional_images) {
+        setAdditionalImages({
+          addition_main: article.additional_images.main_image || null,
+          addition_adaptive: article.additional_images.adaptive_image || null,
+        });
+        console.log("Additional Images after setting:", {
+          main_image: article.additional_images.main_image || null,
+          adaptive_image: article.additional_images.adaptive_image || null,
+        });
+      }
+    }
+  }, [article, setValue, getValues]);
+
   const onSaveHandler = async (data) => {
+    console.log("Form data:", data);
     setLoading(true);
     try {
       const formData = new FormData();
@@ -50,23 +109,23 @@ const EditArticleForm = ({ onClose }) => {
         formData.append("carouselImages", file.file); // Каждый файл в массив
       });
 
-      if (bannerImage.main) {
+      if (bannerImage.main instanceof Blob) {
         formData.append("mainBanner", bannerImage.main);
       }
 
-      if (bannerImage.adaptive) {
+      if (bannerImage.adaptive instanceof Blob) {
         formData.append("adaptiveBanner", bannerImage.adaptive);
       }
 
-      if (videoSection.thumbnail) {
+      if (videoSection.thumbnail instanceof Blob) {
         formData.append("videoThumbnail", videoSection.thumbnail);
       }
 
-      if (additionalImages.addition_main) {
+      if (additionalImages.addition_main instanceof Blob) {
         formData.append("mainAdditionImg", additionalImages.addition_main);
       }
 
-      if (additionalImages.addition_adaptive) {
+      if (additionalImages.addition_adaptive instanceof Blob) {
         formData.append(
           "adaptiveAdditionImg",
           additionalImages.addition_adaptive
@@ -82,9 +141,6 @@ const EditArticleForm = ({ onClose }) => {
       formData.append("video_url", data.video_section.video_url);
 
       watchFeatures.forEach((feature, index) => {
-        console.log("Feature before formData append:", feature);
-        console.log("Feature File:------", feature.file);
-        console.log("Feature File Type:", feature.file instanceof File);
         formData.append(`watch_features[${index}][title]`, feature.title);
         formData.append(
           `watch_features[${index}][description]`,
@@ -208,7 +264,10 @@ const EditArticleForm = ({ onClose }) => {
               }}
             >
               <Grid item xs={12} md={6}>
-                <ImageCarouselUploader onFilesChange={handleFilesChange} />
+                <ImageCarouselUploader
+                  onFilesChange={handleFilesChange}
+                  imageUrls={carouselImages}
+                />
               </Grid>
               <Grid item xs={12} md={6}>
                 <Grid
@@ -294,12 +353,19 @@ const EditArticleForm = ({ onClose }) => {
               marginBottom: "20px",
             }}
           >
-            <Grid item margin={"10px 0"}>
+            <Grid
+              justifyContent={"center"}
+              display={"flex"}
+              item
+              margin={"10px 0"}
+            >
               <AddImageBtn
                 register={register}
                 onFileChange={handleBannerFileChange}
                 previewImage={
-                  bannerImage?.main ? URL.createObjectURL(bannerImage.main) : ""
+                  bannerImage?.main instanceof Blob
+                    ? URL.createObjectURL(bannerImage.main)
+                    : bannerImage?.main || ""
                 }
                 fileKey="main"
                 containerStyle={{
@@ -307,40 +373,52 @@ const EditArticleForm = ({ onClose }) => {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "flex-end",
-                  justifyContent: "space-between", // Распределяем контент равномерно
+                  justifyContent: "space-between",
                   height: "100%",
                 }}
                 buttonStyle={{
                   width: "100%",
                   height: bannerImage?.main ? "60px" : "150px",
                 }}
-                buttonText="Upload Main Banner image"
+                buttonText={
+                  bannerImage?.main
+                    ? "Change main banner image"
+                    : "Upload Main Banner image"
+                }
               />
             </Grid>
-            <Grid item margin={"10px 0"}>
+            <Grid
+              item
+              margin={"10px 0"}
+              justifyContent={"center"}
+              display={"flex"}
+            >
               <AddImageBtn
                 register={register}
                 onFileChange={handleBannerFileChange}
                 previewImage={
-                  bannerImage?.adaptive
+                  bannerImage?.adaptive instanceof Blob
                     ? URL.createObjectURL(bannerImage.adaptive)
-                    : ""
+                    : bannerImage?.adaptive || ""
                 }
                 fileKey="adaptive"
-                ъ
                 containerStyle={{
                   width: "100%",
                   display: "flex",
                   flexDirection: "column",
 
-                  justifyContent: "space-between", // Распределяем контент равномерно
+                  justifyContent: "space-between",
                   height: "100%",
                 }}
                 buttonStyle={{
                   width: "100%",
                   height: bannerImage?.adaptive ? "60px" : "150px",
                 }}
-                buttonText="Upload Adaptive Banner image"
+                buttonText={
+                  bannerImage?.adaptive
+                    ? "Change adaptive banner image"
+                    : "Upload Adaptive Banner image"
+                }
               />
             </Grid>
             <Grid
@@ -388,10 +466,11 @@ const EditArticleForm = ({ onClose }) => {
                     helperText={errors.banner_text?.title?.message}
                   />
                 </Grid>
-
                 <Grid item width={"100%"}>
                   <TextField
                     label="Banner text"
+                    multiline
+                    minRows={3}
                     type="text"
                     sx={{ width: "100%", backgroundColor: "#fff" }}
                     {...register("banner_text.text")}
@@ -413,14 +492,14 @@ const EditArticleForm = ({ onClose }) => {
               marginBottom: "20px",
             }}
           >
-            <Grid item xs={12}>
+            <Grid item xs={12} display={"flex"} justifyContent={"center"}>
               <AddImageBtn
                 register={register}
                 onFileChange={handleVideoThumbnailChange}
                 previewImage={
-                  videoSection.thumbnail
+                  videoSection.thumbnail instanceof Blob
                     ? URL.createObjectURL(videoSection.thumbnail)
-                    : ""
+                    : videoSection.thumbnail || ""
                 }
                 fileKey="thumbnail"
                 containerStyle={{ width: "100%" }}
@@ -428,7 +507,11 @@ const EditArticleForm = ({ onClose }) => {
                   width: "100%",
                   height: videoSection?.thumbnail ? "60px" : "150px",
                 }}
-                buttonText="Upload player cover"
+                buttonText={
+                  videoSection?.thumbnail
+                    ? "Change Cover"
+                    : "Upload player cover"
+                }
               />
             </Grid>
             <Grid item width={"100%"}>
@@ -471,14 +554,14 @@ const EditArticleForm = ({ onClose }) => {
               marginBottom: "20px",
             }}
           >
-            <Grid item xs={12}>
+            <Grid item xs={12} display={"flex"} justifyContent={"center"}>
               <AddImageBtn
                 register={register}
                 onFileChange={handleAdditionFileChange}
                 previewImage={
-                  additionalImages?.addition_main
+                  additionalImages?.addition_main instanceof Blob
                     ? URL.createObjectURL(additionalImages.addition_main)
-                    : ""
+                    : additionalImages?.addition_main || ""
                 }
                 fileKey="addition_main"
                 containerStyle={{ width: "100%" }}
@@ -487,16 +570,17 @@ const EditArticleForm = ({ onClose }) => {
                   height: additionalImages?.addition_main ? "60px" : "150px",
                 }}
                 buttonText="Upload an additional main image"
+                fullWidth
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} display={"flex"} justifyContent={"center"}>
               <AddImageBtn
                 register={register}
                 onFileChange={handleAdditionFileChange}
                 previewImage={
-                  additionalImages?.addition_adaptive
+                  additionalImages?.addition_adaptive instanceof Blob
                     ? URL.createObjectURL(additionalImages.addition_adaptive)
-                    : ""
+                    : additionalImages?.addition_adaptive || ""
                 }
                 fileKey="addition_adaptive"
                 containerStyle={{ width: "100%" }}
@@ -507,6 +591,7 @@ const EditArticleForm = ({ onClose }) => {
                     : "150px",
                 }}
                 buttonText="Upload an additional adaptive image"
+                fullWidth
               />
             </Grid>
           </Grid>
@@ -551,6 +636,7 @@ const EditArticleForm = ({ onClose }) => {
                       sx={{
                         display: "flex",
                         flexDirection: "column",
+                        alignItems: "center",
                       }}
                     >
                       <img

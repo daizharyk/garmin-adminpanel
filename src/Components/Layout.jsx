@@ -22,8 +22,8 @@ import { Menu, MenuItem } from "@mui/material";
 
 const drawerWidth = 240;
 const navItems = [
-  { text: "All articles", link: "/", isAuth: false },
-  { text: "My article", link: "/my-articles", isAuth: true },
+  { text: "All products", link: "/", isAuth: false },
+  { text: "My products", link: "/my-articles", isAuth: true },
   { text: "Profile", link: "/profile", isAuth: true },
 ];
 
@@ -55,7 +55,7 @@ const Layout = ({ children, window }) => {
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
       <Typography variant="h6" sx={{ my: 2 }}>
-        Node blog
+        GARMIN
       </Typography>
       <Divider />
       <List>
@@ -100,7 +100,7 @@ const Layout = ({ children, window }) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar component="nav">
+      <AppBar component="nav" sx={{ backgroundColor: "#000" }}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -116,13 +116,18 @@ const Layout = ({ children, window }) => {
             component="div"
             sx={{ flexGrow: 1, display: { xs: "none", sm: "block" } }}
           >
-            Node Blog
+            GARMIN
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             {currentNavItem.map((item) => (
               <Button
                 key={item}
-                sx={{ color: "#fff" }}
+                sx={{
+                  color: "#fff",
+                  transition: "background-color 0.3s, color 0.3s",
+                  "&:hover": { backgroundColor: "#fff", color: "#000" },
+                  marginRight: 2,
+                }}
                 component={Link}
                 to={item.link}
               >
@@ -132,7 +137,11 @@ const Layout = ({ children, window }) => {
             {user && (
               <>
                 <Button
-                  sx={{ color: "#fff" }}
+                  sx={{
+                    color: "#fff",
+                    transition: "background-color 0.3s, color 0.3s",
+                    "&:hover": { backgroundColor: "#fff", color: "#000" },
+                  }}
                   onClick={handleMenuClick}
                 >{`Hellow, ${user.name}`}</Button>
                 <Menu
@@ -149,7 +158,15 @@ const Layout = ({ children, window }) => {
               </>
             )}
             {!user && (
-              <Button component={Link} to={"/login"} sx={{ color: "#fff" }}>
+              <Button
+                component={Link}
+                to={"/login"}
+                sx={{
+                  color: "#fff",
+                  transition: "background-color 0.3s, color 0.3s",
+                  "&:hover": { backgroundColor: "#fff", color: "#000" },
+                }}
+              >
                 Login
               </Button>
             )}
@@ -163,7 +180,7 @@ const Layout = ({ children, window }) => {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
           sx={{
             display: { xs: "block", sm: "none" },

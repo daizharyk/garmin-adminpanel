@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { register as userRegister } from "../../services/userService";
 
-const Register = () => {
+const Register = ({onRegister}) => {
   const {
     register,
     handleSubmit,
@@ -17,9 +17,12 @@ const Register = () => {
       const res = await userRegister(data);
       localStorage.setItem("user", JSON.stringify(res));
       console.log(res);
+      await onRegister(data);
     } catch (error) {
       console.log(error?.response?.data);
-      setErrorMessage(error?.response?.data?.message || "Регистрация не удалась");
+      setErrorMessage(
+        error?.response?.data?.message || "Регистрация не удалась"
+      );
     }
   };
   return (
@@ -72,8 +75,17 @@ const Register = () => {
           />
         </Grid>
         <Grid item>
-          <Button type={"submit"} variant="contained">
-            Login
+          <Button
+            sx={{
+              backgroundColor: "#000",
+              color: "#fff",
+              transition: "background-color 0.2s, color 0.2s",
+              "&:hover": { backgroundColor: "#fff", color: "#000" },
+            }}
+            type={"submit"}
+            variant="contained"
+          >
+            Register
           </Button>
         </Grid>
       </Grid>

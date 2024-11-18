@@ -71,8 +71,8 @@ const Login = () => {
             error={!!errors.email}
             helperText={errors.email?.message}
             InputProps={{
-              sx:{
-                borderRadius: "0"
+              sx: {
+                borderRadius: "0",
               },
             }}
           />
@@ -81,23 +81,31 @@ const Login = () => {
           <TextField
             label="Password"
             type="password"
-            sx={{ width: "100%"   }}
+            sx={{ width: "100%" }}
             {...register("password", {
               required: "Password is  required",
-             
             })}
             error={!!errors.password}
             helperText={errors.password?.message}
             InputProps={{
-              sx:{
-                borderRadius: "0"
+              sx: {
+                borderRadius: "0",
               },
             }}
           />
         </Grid>
 
         <Grid item>
-          <Button type={"submit"} variant="contained">
+          <Button
+            sx={{
+              backgroundColor: "#000",
+              color: "#fff",
+              transition: "background-color 0.2s, color 0.2s",
+              "&:hover": { backgroundColor: "#fff", color: "#000" },
+            }}
+            type={"submit"}
+            variant="contained"
+          >
             Login
           </Button>
         </Grid>
