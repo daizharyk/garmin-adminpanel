@@ -2,33 +2,35 @@ import React, { useEffect, useState } from "react";
 import { Button, Grid, Card, CardMedia, Checkbox } from "@mui/material";
 import { Delete as DeleteIcon } from "@mui/icons-material";
 
-const ImageCarouselUploader = ({ article, onFilesChange, imageUrls = [] }) => {
+const ImageCarouselUploader = ({ onFilesChange, imageUrls = [] }) => {
   const [files, setFiles] = useState([]);
   const [selectedIndexes, setSelectedIndexes] = useState([]);
   const [imagesSelected, setImagesSelected] = useState(false);
 
   useEffect(() => {
-    const initialFiles = imageUrls.map((url) => ({
-      preview: url, // URL изображения
-      file: null, // Это URL, а не локальный файл
-    }));
-    setFiles((prevFiles) => [
-      ...prevFiles.filter((item) => item.file === null || item.file),
-      ...initialFiles,
-    ]);
-    console.log("Initial Files:", initialFiles);
-  }, [imageUrls]);
+    if (files.length === 0) {
+      const initialFiles = imageUrls.map((url) => ({
+        preview: url,
+        file: null, 
+      }));
+      setFiles((prevFiles) => [
+        ...prevFiles.filter((item) => item.file === null || item.file),
+        ...initialFiles,
+      ]);
+      // console.log("Initial Files:", initialFiles);
+    }
+  }, [onFilesChange]);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    console.log("selectedFiles", selectedFiles);
+    // console.log("selectedFiles", selectedFiles);
 
     const newFiles = selectedFiles.map((file) => ({
       file,
-      preview: URL.createObjectURL(file), // Создаем URL для превью
+      preview: URL.createObjectURL(file), 
     }));
 
-    // Добавляем новые файлы без вложенности
+
     setFiles((prevFiles) => {
       const updatedFiles = [
         ...prevFiles.filter((item) => item.file === null || item.file), // Убедимся, что не добавляем вложенные объекты

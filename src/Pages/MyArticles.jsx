@@ -25,7 +25,7 @@ const MyArticles = () => {
   };
 
   return (
-    <>
+    < >
       <PageWrapper title={"MY PRODUCTS"}>
         {loading && <Spinner />}
         <ArticleList items={userArticles} isEdited={true} />
@@ -54,7 +54,7 @@ const MyArticles = () => {
           </Tooltip>
         </Grid>
       </PageWrapper>
-      {isEditFormOpen && <EditArticleForm onClose={handleCloseForm} />}
+      {isEditFormOpen  && <EditArticleForm onClose={handleCloseForm} />}
     </>
   );
 };

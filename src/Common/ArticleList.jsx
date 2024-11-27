@@ -28,6 +28,8 @@ const ArticleList = ({ items, isEdited }) => {
               video_section={article.video_section}
               additional_images={article.additional_images}
               carousel_images={article.carousel_images}
+              product_title={article.product_title}
+              category={article.category}
             />
           </Grid>
         );

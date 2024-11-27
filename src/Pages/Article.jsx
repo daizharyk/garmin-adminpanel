@@ -12,7 +12,7 @@ const Article = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { readedArticle, loading } = useSelector((state) => state.articles);
-  console.log(readedArticle);
+
 
   useEffect(() => {
     if (!readedArticle || readedArticle._id !== id) {

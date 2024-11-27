@@ -5,12 +5,11 @@ import Register from "./Register";
 import Login from "./Login";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
-import { registerUser, loginUser } from "../../store/slices/authSlice";
+
 
 const AuthWrapper = () => {
   const [type, setType] = useState("login");
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+
   const typeChangeHandler = () => {
     setType((prev) => (prev === "login" ? "register" : "login"));
   };
@@ -21,16 +20,7 @@ const AuthWrapper = () => {
     return <Navigate replace to="/" />;
   }
 
-  const handleRegister = async (data) => {
-    try {
-      await dispatch(registerUser(data));
-      const { email, password } = data;
-      await dispatch(loginUser({ email, password }));
-      navigate("/");
-    } catch (error) {
-      console.error("Registration failed", error);
-    }
-  };
+
 
   return (
     <PageWrapper title={type === "login" ? "Login" : "Register"}>
@@ -49,7 +39,7 @@ const AuthWrapper = () => {
           {type === "login" ? (
             <Login />
           ) : (
-            <Register onRegister={handleRegister} />
+            <Register  />
           )}
         </Grid>
         <Grid container item flexDirection={"column"} alignItems={"center"}>

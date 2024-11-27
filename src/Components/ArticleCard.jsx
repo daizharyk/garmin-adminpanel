@@ -7,13 +7,13 @@ import {
   createTheme,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import "../../src/styles.css";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+
 import EditArticleForm from "./EditArticleForm";
 
-const ArticleCard = ({
+const ArticleCard = memo(({
   _id,
   name,
   text,
@@ -29,7 +29,11 @@ const ArticleCard = ({
   additional_images,
   carousel_images,
   isEdited,
+  product_title,
+  category
 }) => {
+
+
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const handleOpenForm = () => {
     setIsEditFormOpen(true);
@@ -59,7 +63,7 @@ const ArticleCard = ({
             objectFit: "contain",
             overflow: "hidden",
           }}
-          image={`${baseImageUrl}/${image}`}
+          image={image}
           title={name}
         />
         <CardContent
@@ -138,7 +142,7 @@ const ArticleCard = ({
         </CardActions>
       </Card>
       {isEditFormOpen && (
-        <EditArticleForm
+        <EditArticleForm 
           onClose={handleCloseForm}
           article={{
             _id,
@@ -154,12 +158,14 @@ const ArticleCard = ({
             watch_features,
             video_section,
             additional_images,
-            carousel_images
+            carousel_images,
+            product_title,
+            category
           }}
         />
       )}
     </>
   );
-};
+});
 
 export default ArticleCard;

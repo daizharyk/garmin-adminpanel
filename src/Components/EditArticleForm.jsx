@@ -3,22 +3,26 @@ import {
   Box,
   Button,
   CircularProgress,
+  FormControl,
   Grid,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   TextField,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { addArticle } from "../store/slices/articlesSlice";
-import axios from "axios";
-import { selectToken } from "../store/slices/authSlice";
+import { addArticle, updateArticle } from "../store/slices/articlesSlice";
+
 import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./addImageBtn";
 
 const EditArticleForm = ({ onClose, article }) => {
-  const token = useSelector(selectToken);
+  console.log("Received article in EditArticleForm:", article);
+
   const {
     register,
     handleSubmit,
@@ -40,35 +44,30 @@ const EditArticleForm = ({ onClose, article }) => {
     addition_main: null,
     addition_adaptive: null,
   });
-
+  const [mainImage, setMainImage] = useState(null);
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     if (article) {
-      console.log("Article data before setting values:", article);
       setValue("name", article.name || "");
-      setValue("price", article.price || 0);
+      setValue("price", article.price || null);
       setValue("color", article.color || "");
       setValue("status", article.status || "");
-
+      setValue("text", article.text || "");
+      setValue("category", article.category || "");
+      setValue("product_title", article.product_title || "");
+      if (article.image) {
+        setMainImage(article.image || null);
+      }
       if (article.carousel_images) {
         setCarouselImages(article.carousel_images || []);
-        console.log(
-          "Carousel Images after setting:",
-          article.carousel_images || []
-        );
       }
       if (article.banner_text) {
         setValue("banner_text.title", article.banner_text.title || "");
         setValue("banner_text.text", article.banner_text.text || "");
         setBannerImage({
-          main: article.banner_text.banner_images?.main_banner || null,
-          adaptive: article.banner_text.banner_images?.adaptive_banner || null,
-        });
-        console.log("Banner Text after setting:", getValues("banner_text"));
-        console.log("Banner Images after setting:", {
           main: article.banner_text.banner_images?.main_banner || null,
           adaptive: article.banner_text.banner_images?.adaptive_banner || null,
         });
@@ -92,10 +91,6 @@ const EditArticleForm = ({ onClose, article }) => {
           addition_main: article.additional_images.main_image || null,
           addition_adaptive: article.additional_images.adaptive_image || null,
         });
-        console.log("Additional Images after setting:", {
-          main_image: article.additional_images.main_image || null,
-          adaptive_image: article.additional_images.adaptive_image || null,
-        });
       }
     }
   }, [article, setValue, getValues]);
@@ -105,10 +100,16 @@ const EditArticleForm = ({ onClose, article }) => {
     setLoading(true);
     try {
       const formData = new FormData();
-      carouselImages.forEach((file) => {
-        formData.append("carouselImages", file.file); // Каждый файл в массив
-      });
-
+      if (carouselImages && Array.isArray(carouselImages)) {
+        carouselImages.forEach((file) => {
+          if (file && file.file instanceof Blob) {
+            formData.append("carouselImages", file.file); // Каждый файл в массив
+          }
+        });
+      }
+      if (mainImage instanceof Blob) {
+        formData.append("mainImage", mainImage);
+      }
       if (bannerImage.main instanceof Blob) {
         formData.append("mainBanner", bannerImage.main);
       }
@@ -132,6 +133,9 @@ const EditArticleForm = ({ onClose, article }) => {
         );
       }
 
+      formData.append("category", data.category);
+      formData.append("text", data.text);
+      formData.append("product_title", data.product_title);
       formData.append("name", data.name);
       formData.append("price", data.price);
       formData.append("color", data.color);
@@ -140,30 +144,31 @@ const EditArticleForm = ({ onClose, article }) => {
       formData.append("banner_text", data.banner_text.text);
       formData.append("video_url", data.video_section.video_url);
 
-      watchFeatures.forEach((feature, index) => {
-        formData.append(`watch_features[${index}][title]`, feature.title);
-        formData.append(
-          `watch_features[${index}][description]`,
-          feature.description
-        );
-        formData.append(`watch_features_image_${index}`, feature.file);
-      });
+      if (Array.isArray(watchFeatures)) {
+        watchFeatures.forEach((feature, index) => {
+          formData.append(`watch_features[${index}][title]`, feature.title);
+          formData.append(
+            `watch_features[${index}][description]`,
+            feature.description
+          );
 
-      const response = await axios.post(
-        "http://localhost:3005/api/items",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Response", response);
-      dispatch(addArticle(response.data));
+          if (feature.file instanceof Blob) {
+            formData.append(`watch_features_image_${index}`, feature.file);
+          }
+        });
+      }
+
+      const isEditMode = !!article?._id;
+      if (isEditMode) {
+        await dispatch(updateArticle({ data: formData, id: article._id }));
+      } else {
+        console.log("Creating a new article");
+        await dispatch(addArticle(formData));
+      }
+
       onClose();
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -178,6 +183,11 @@ const EditArticleForm = ({ onClose, article }) => {
       ...prevState,
       [fileKey]: file,
     }));
+  };
+  const handlerCardImage = (file, fileKey) => {
+    if (fileKey === "main") {
+      setMainImage(file);
+    }
   };
 
   const handleVideoThumbnailChange = (file) => {
@@ -245,6 +255,93 @@ const EditArticleForm = ({ onClose, article }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <form onSubmit={handleSubmit(onSaveHandler)}>
+          <Grid
+            item
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              backgroundColor: "#edf2f4",
+              padding: "16px",
+              marginBottom: "20px",
+            }}
+          >
+            <Grid display={"flex"} justifyContent={"center"} item>
+              <AddImageBtn
+                register={register}
+                onFileChange={handlerCardImage}
+                previewImage={
+                  mainImage instanceof Blob
+                    ? URL.createObjectURL(mainImage)
+                    : mainImage || ""
+                }
+                fileKey="main"
+                containerStyle={{
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "flex-end",
+                  justifyContent: "space-between",
+                  height: "100%",
+                }}
+                buttonStyle={{
+                  width: "100%",
+                  height: mainImage ? "60px" : "150px",
+                }}
+                buttonText={
+                  mainImage ? "Change card image" : "Upload card image"
+                }
+              />
+            </Grid>
+            <Grid container gap={"10px"}>
+              <Grid item width={"100%"}>
+                <TextField
+                  label="Product title"
+                  type="product_title"
+                  sx={{ width: "100%", backgroundColor: "#fff" }}
+                  {...register("product_title", {
+                    required: "Produc title is required",
+                  })}
+                  error={!!errors.product_title}
+                  helperText={errors.product_title?.message}
+                />
+              </Grid>
+              <Grid item width={"100%"}>
+                <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    label="category"
+                    {...register("category", {
+                      required: "Category is required",
+                    })}
+                    error={!!errors.category}
+                    defaultValue={article.category}
+                  >
+                    <MenuItem value="Smartwatches">Smartwatches</MenuItem>
+                  </Select>
+
+                  {errors.category && (
+                    <FormHelperText error>
+                      {errors.category.message}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+              <Grid item width={"100%"}>
+                <TextField
+                  label="Text"
+                  type="text"
+                  sx={{ width: "100%", backgroundColor: "#fff" }}
+                  {...register("text", {
+                    required: "Text is required",
+                  })}
+                  error={!!errors.text}
+                  helperText={errors.text?.message}
+                  multiline
+                  minRows={3}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
           <Grid
             item
             xs={12}
@@ -797,7 +894,13 @@ const EditArticleForm = ({ onClose, article }) => {
               variant="contained"
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : "Save"}
+              {loading ? (
+                <CircularProgress size={24} />
+              ) : article ? (
+                "Update"
+              ) : (
+                "Save"
+              )}
             </Button>
           </Grid>
         </form>

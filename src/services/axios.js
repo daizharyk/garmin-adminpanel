@@ -4,8 +4,6 @@ const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-console.log(import.meta.env.VITE_API_URL); // Проверьте, что значение правильно подставляется
-console.log(instance);
 
 
 instance.interceptors.request.use((config) => {

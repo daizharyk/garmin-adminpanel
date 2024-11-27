@@ -1,23 +1,29 @@
-import { Button, Grid, TextField } from "@mui/material";
+import { Alert, Button, Grid, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { register as userRegister } from "../../services/userService";
+import { loginUser } from "../../store/slices/authSlice";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
-const Register = ({onRegister}) => {
+const Register = ({ onRegister }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
 
   const onRegisterHandler = async (data) => {
     try {
       const res = await userRegister(data);
       localStorage.setItem("user", JSON.stringify(res));
+      const { email, password } = data;
+      await dispatch(loginUser({ email, password }));
+      navigate("/");
       console.log(res);
-      await onRegister(data);
     } catch (error) {
       console.log(error?.response?.data);
       setErrorMessage(
@@ -27,6 +33,11 @@ const Register = ({onRegister}) => {
   };
   return (
     <form onSubmit={handleSubmit(onRegisterHandler)}>
+      {errorMessage && (
+        <Grid item sx={{ margin: "20px 0" }} width={"100%"}>
+          <Alert severity="error">{errorMessage}</Alert>
+        </Grid>
+      )}
       <Grid container spacing={4} justifyContent={"center"}>
         <Grid item width={"100%"}>
           <TextField

@@ -1,8 +1,6 @@
-
 import { getRequest, postRequest, putRequest } from "./service";
 
 const API_URL = "items";
-
 
 export async function getAllArticles() {
   const articles = await getRequest(`${API_URL}`);
@@ -21,6 +19,13 @@ export async function addArticle(data) {
   return article;
 }
 export async function updateArticle(data, id) {
+  console.log("Updating article with ID:", id);
+  console.log("Data being sent:", data);
+
   const article = await putRequest(`${API_URL}/${id}/`, data);
+
+  console.log("Response from server:", article);
+
   return article;
 }
+

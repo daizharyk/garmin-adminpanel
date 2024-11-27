@@ -25,9 +25,9 @@ const AddImageBtn = ({
   const handleFileRemove = () => {
     setFileName("");
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // Сбрасываем значение поля input
+      fileInputRef.current.value = ""; 
     }
-    onFileChange(null, fileKey); // Удаляем файл из родительского компонента
+    onFileChange(null, fileKey); 
   };
 
   return (
@@ -61,7 +61,7 @@ const AddImageBtn = ({
             alt="Preview"
             style={{
               objectFit: "contain",
-              width: "450px",
+              width: "350px",
               height: "auto",
               maxWidth: "100%",
             }}

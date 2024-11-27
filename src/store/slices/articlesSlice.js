@@ -18,10 +18,20 @@ export const getAllArticles = createAsyncThunk("article/getAll", async () => {
   return response;
 });
 
-export const getMyArticles = createAsyncThunk("article/getMy", async () => {
-  const response = await getMy();
-  return response;
-});
+export const getMyArticles = createAsyncThunk(
+  "article/getMy",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getMy();
+      return response;
+    } catch (error) {
+      console.error("Error fetching articles:", error);
+      return rejectWithValue(
+        error.response ? error.response.data : error.message
+      );
+    }
+  }
+);
 export const getMyArticleById = createAsyncThunk(
   "article/getById",
   async (id) => {
@@ -35,10 +45,14 @@ export const addArticle = createAsyncThunk("article/add", async (data) => {
   return response;
 });
 
-export const updateArticle = createAsyncThunk("article/update", async () => {
-  const responce = await update(data, data._id);
-  return responce;
-});
+export const updateArticle = createAsyncThunk(
+  "article/update",
+  async ({ data, id }) => {
+    const responce = await update(data, id);
+    return responce;
+  }
+);
+
 export const slice = createSlice({
   name: "articles",
   initialState,
@@ -68,14 +82,18 @@ export const slice = createSlice({
     builder.addCase(addArticle.fulfilled, (state, action) => {
       state.userArticles = [...state.userArticles, action.payload];
     });
-    builder.addCase(updateArticle.fulfilled, (state, action) => {
-      state.userArticles = state.userArticles.map((article) => {
-        if (article._id === action.payload._id) {
-          return action.payload;
-        }
-        return article;
+    builder
+      .addCase(updateArticle.fulfilled, (state, action) => {
+        state.userArticles = state.userArticles.map((article) => {
+          if (article._id === action.payload._id) {
+            return action.payload;
+          }
+          return article;
+        });
+      })
+      .addCase(updateArticle.rejected, (state) => {
+        state.loading = false;
       });
-    });
   },
 });
 export default slice.reducer;
