@@ -14,7 +14,7 @@ const AllArticles = () => {
     if (allArticles.length === 0) {
       dispatch(getAllArticles());
     }
-  }, []);
+  }, [dispatch]);
 
   return (
     <PageWrapper title={"All products"}>
@@ -23,5 +23,6 @@ const AllArticles = () => {
     </PageWrapper>
   );
 };
+
 
 export default AllArticles;

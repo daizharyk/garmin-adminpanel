@@ -8,9 +8,8 @@ export async function postRequest(url, body = {}) {
     }
     return await res.data;
   } catch (error) {
-    throw error.response.data
+    throw error.response.data;
   }
-
 }
 
 export async function putRequest(url, body = {}) {
@@ -38,4 +37,13 @@ export async function getRequest(url) {
     throw res;
   }
   return await res.data;
+}
+
+export async function patchRequest(url, body = {}) {
+  try {
+    const res = await axios.patch(url, body);
+    return await res.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
 }

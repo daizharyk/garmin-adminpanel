@@ -1,4 +1,4 @@
-import { getRequest, postRequest, putRequest } from "./service";
+import { deleteRequest, getRequest, patchRequest, postRequest, putRequest } from "./service";
 
 const API_URL = "items";
 
@@ -19,13 +19,20 @@ export async function addArticle(data) {
   return article;
 }
 export async function updateArticle(data, id) {
-  console.log("Updating article with ID:", id);
-  console.log("Data being sent:", data);
-
   const article = await putRequest(`${API_URL}/${id}/`, data);
+  return article;
+}
 
-  console.log("Response from server:", article);
-
+export async function deleteArticle(id) {
+  const article = await patchRequest(`${API_URL}/${id}`);
+  return { id: article._id, isDeleted: true };
+}
+export async function restoreArticle(id) {
+  const article = await patchRequest(`${API_URL}/${id}/restore`);
+  return { id: article._id, isDeleted: false };
+}
+export async function deleteForceArticle(id) {
+  const article = await deleteRequest(`${API_URL}/force/${id}`);
   return article;
 }
 

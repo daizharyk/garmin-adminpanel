@@ -1,10 +1,13 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   getAllArticles as getAll,
   getMyArticles as getMy,
   getArticleById as getById,
   addArticle as add,
   updateArticle as update,
+  deleteArticle as softDelete,
+  restoreArticle as restore,
+  deleteForceArticle as forceDelete,
 } from "../../services/articleService";
 
 const initialState = {
@@ -13,6 +16,9 @@ const initialState = {
   userArticles: [],
   readedArticle: null,
 };
+
+export const clearArticles = createAction("article/clear");
+
 export const getAllArticles = createAsyncThunk("article/getAll", async () => {
   const response = await getAll();
   return response;
@@ -25,7 +31,6 @@ export const getMyArticles = createAsyncThunk(
       const response = await getMy();
       return response;
     } catch (error) {
-      console.error("Error fetching articles:", error);
       return rejectWithValue(
         error.response ? error.response.data : error.message
       );
@@ -52,12 +57,35 @@ export const updateArticle = createAsyncThunk(
     return responce;
   }
 );
-
+export const deleteArticle = createAsyncThunk("article/delete", async (id) => {
+  const responce = await softDelete(id);
+  return responce;
+});
+export const restoreArticle = createAsyncThunk(
+  "article/restore",
+  async (id) => {
+    const response = await restore(id);
+    return { id: response.id, isDeleted: false };
+  }
+);
+export const deleteForceArticle = createAsyncThunk(
+  "article/force",
+  async (id) => {
+    const response = await forceDelete(id);
+    return response;
+  }
+);
 export const slice = createSlice({
   name: "articles",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(clearArticles, (state) => {
+      state.loading = false;
+
+      state.userArticles = [];
+      state.readedArticle = null;
+    });
     builder.addCase(getAllArticles.pending, (state, action) => {
       state.loading = true;
     });
@@ -94,6 +122,44 @@ export const slice = createSlice({
       .addCase(updateArticle.rejected, (state) => {
         state.loading = false;
       });
+    builder.addCase(deleteArticle.fulfilled, (state, action) => {
+      state.userArticles = state.userArticles.map((article) => {
+        if (article._id === action.payload.id) {
+          return { ...article, isDeleted: action.payload.isDeleted };
+        }
+        return article;
+      });
+      state.loading = false;
+    });
+
+    builder.addCase(deleteArticle.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(deleteArticle.rejected, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(restoreArticle.fulfilled, (state, action) => {
+      state.userArticles = state.userArticles.map((article) => {
+        if (article._id === action.payload.id) {
+          return { ...article, isDeleted: action.payload.isDeleted };
+        }
+        return article;
+      });
+      state.loading = false;
+    });
+    builder.addCase(restoreArticle.pending, (state) => {
+      state.loading = true;
+    });
+
+    builder.addCase(restoreArticle.rejected, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(deleteForceArticle.fulfilled, (state, action) => {
+      state.userArticles = state.userArticles.filter(
+        (article) => article._id !== action.payload._id
+      );
+    });
   },
 });
 export default slice.reducer;

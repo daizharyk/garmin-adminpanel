@@ -17,13 +17,12 @@ const ImageCarouselUploader = ({ onFilesChange, imageUrls = [] }) => {
         ...prevFiles.filter((item) => item.file === null || item.file),
         ...initialFiles,
       ]);
-      // console.log("Initial Files:", initialFiles);
     }
   }, [onFilesChange]);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
-    // console.log("selectedFiles", selectedFiles);
+
 
     const newFiles = selectedFiles.map((file) => ({
       file,

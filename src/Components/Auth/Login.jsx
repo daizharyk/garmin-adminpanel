@@ -1,4 +1,4 @@
-import { Button, Grid, Paper, TextField, Typography } from "@mui/material";
+import { Box, Button, Grid, Paper, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
@@ -33,84 +33,110 @@ const Login = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onLoginHandler)}>
-      <Grid container spacing={4} justifyContent={"center"}>
-        {showError && loginError && (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "50vh", // Высота на весь экран для центрирования
+      }}
+    >
+      <form
+        onSubmit={handleSubmit(onLoginHandler)}
+        style={{
+          width: "70%", // Длина формы 70%
+          maxWidth: "500px", // Ограничение максимальной ширины
+          padding: "20px",
+          backgroundColor: "#f9f9f9",
+          borderRadius: "8px",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
+        <Grid
+          container
+          display={"flex"}
+          flexDirection={"column"}
+          alignItems={"center"}
+          spacing={4}
+          justifyContent={"center"}
+        >
+          {showError && loginError && (
+            <Grid item width={"100%"}>
+              <Paper
+                sx={{
+                  backgroundColor: "#fae0e4",
+                  color: "#8d0801",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  border: "0.5px solid #fcb9b2",
+                  borderRadius: "4px", // Добавил скругленные углы
+                  padding: "15px",
+                  boxShadow: "none",
+                }}
+              >
+                <Typography variant="body1" style={{ margin: 0 }}>
+                  {loginError}
+                </Typography>
+                <CloseButton onClick={handleClose} />
+              </Paper>
+            </Grid>
+          )}
           <Grid item width={"100%"}>
-            <Paper
-              sx={{
-                backgroundColor: "#fae0e4",
-                color: "#8d0801",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                border: "0.5px solid #fcb9b2",
-                borderRadius: "0",
-                padding: "15px",
-                boxShadow: "none",
+            <TextField
+              label="Email"
+              sx={{ width: "100%", backgroundColor: "#fffffc" }}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
+                  message: "Invalid email address",
+                },
+              })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+              InputProps={{
+                sx: {
+                  borderRadius: "4px", // Скругление углов
+                },
               }}
-            >
-              <Typography variant="body1" style={{ margin: 0 }}>
-                {loginError}
-              </Typography>
-              <CloseButton onClick={handleClose} />
-            </Paper>
+            />
           </Grid>
-        )}
-        <Grid item width={"100%"}>
-          <TextField
-            label="Email"
-            sx={{ width: "100%" }}
-            {...register("email", {
-              required: "Email is  required",
-              pattern: {
-                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
-                message: "Invalid email address",
-              },
-            })}
-            error={!!errors.email}
-            helperText={errors.email?.message}
-            InputProps={{
-              sx: {
-                borderRadius: "0",
-              },
-            }}
-          />
-        </Grid>
-        <Grid item width={"100%"}>
-          <TextField
-            label="Password"
-            type="password"
-            sx={{ width: "100%" }}
-            {...register("password", {
-              required: "Password is  required",
-            })}
-            error={!!errors.password}
-            helperText={errors.password?.message}
-            InputProps={{
-              sx: {
-                borderRadius: "0",
-              },
-            }}
-          />
-        </Grid>
+          <Grid item width={"100%"}>
+            <TextField
+              label="Password"
+              type="password"
+              sx={{ width: "100%", backgroundColor: "#fffffc" }}
+              {...register("password", {
+                required: "Password is required",
+              })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+              InputProps={{
+                sx: {
+                  borderRadius: "4px", // Скругление углов
+                },
+              }}
+            />
+          </Grid>
 
-        <Grid item>
-          <Button
-            sx={{
-              backgroundColor: "#000",
-              color: "#fff",
-              transition: "background-color 0.2s, color 0.2s",
-              "&:hover": { backgroundColor: "#fff", color: "#000" },
-            }}
-            type={"submit"}
-            variant="contained"
-          >
-            Login
-          </Button>
+          <Grid item>
+            <Button
+              sx={{
+                backgroundColor: "#000",
+                color: "#fff",
+                transition: "background-color 0.2s, color 0.2s",
+                "&:hover": { backgroundColor: "#fff", color: "#000" },
+              }}
+              type={"submit"}
+              variant="contained"
+            >
+              Login
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </form>
+      </form>
+    </Box>
   );
 };
 

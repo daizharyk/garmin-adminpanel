@@ -1,18 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Grid } from "@mui/material";
 import ArticleCard from "../Components/ArticleCard";
 
-const ArticleList = ({ items, isEdited }) => {
+const ArticleList = ({
+  items,
+  isEdited,
+  onDelete,
+  onRestore,
+  onDeletePermanently,
+  isMyArticlesPage,
+  isDeletedPage,
+  showDeleted,
+  loadingArticleId,
+}) => {
   if (!items || !Array.isArray(items)) {
-    return <p>No articles available</p>; // Вариант отображения, если нет данных
+    return <p>No articles available</p>;
   }
+
+  
+  const filteredItems = showDeleted
+    ? items
+    : items.filter((item) => !item.isDeleted);
   return (
     <Grid container spacing={4}>
-      {items.map((article) => {
+      {filteredItems.map((article) => {
         return (
           <Grid item xs={12} sm={6} md={4} lg={3} key={article._id}>
             <ArticleCard
+              isMyArticlesPage={isMyArticlesPage}
+              isDeletedPage={isDeletedPage}
+              onRestore={onRestore}
+              onDeletePermanently={onDeletePermanently}
+              onDelete={onDelete}
               _id={article._id}
               name={article.name}
               text={article.text}
@@ -30,6 +50,8 @@ const ArticleList = ({ items, isEdited }) => {
               carousel_images={article.carousel_images}
               product_title={article.product_title}
               category={article.category}
+              showDeleted={article.showDeleted}
+              loadingArticleId={loadingArticleId}
             />
           </Grid>
         );

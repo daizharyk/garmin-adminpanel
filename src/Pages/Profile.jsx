@@ -62,56 +62,62 @@ const Profile = () => {
   };
   return (
     <PageWrapper variant={"filled"} title={"Profile"}>
-      <form onSubmit={handleSubmit(onUpdateHandler)}>
-        <Grid container spacing={4} justifyContent={"center"}>
-          <Grid item width={"100%"}>
-            <TextField
-              label="User name"
-              sx={{ width: "100%" }}
-              {...register("name", {
-                required: "Name is  required",
-                minLength: {
-                  value: 5,
-                  message: "Name must be at least 5 characters",
-                },
-              })}
-              error={!!errors.name}
-              helperText={errors.name?.message}
-            />
-          </Grid>
-          <Grid item width={"100%"}>
-            <TextField
-              label="Email"
-              sx={{ width: "100%" }}
-              {...register("email", {
-                required: "Email is  required",
-                pattern: {
-                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
-                  message: "Invalid email address",
-                },
-              })}
-              error={!!errors.email}
-              helperText={errors.email?.message}
-            />
-          </Grid>
+      <Grid container justifyContent="center" alignItems="center">
+        <form onSubmit={handleSubmit(onUpdateHandler)}>
+          <Grid container spacing={4} justifyContent={"center"}>
+            <Grid item width={"100%"}>
+              <TextField
+                label="User name"
+                sx={{ width: "100%" }}
+                {...register("name", {
+                  required: "Name is  required",
+                  minLength: {
+                    value: 5,
+                    message: "Name must be at least 5 characters",
+                  },
+                })}
+                error={!!errors.name}
+                helperText={errors.name?.message}
+              />
+            </Grid>
+            <Grid item width={"100%"}>
+              <TextField
+                label="Email"
+                sx={{ width: "100%" }}
+                {...register("email", {
+                  required: "Email is  required",
+                  pattern: {
+                    value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/i,
+                    message: "Invalid email address",
+                  },
+                })}
+                error={!!errors.email}
+                helperText={errors.email?.message}
+              />
+            </Grid>
 
-          <Grid item>
-            <Button
-              sx={{
-                backgroundColor: "#000",
-                color: "#fff",
-                transition: "background-color 0.2s, color 0.2s",
-                "&:hover": { backgroundColor: "#fff", color: "#000" },
-              }}
-              type={"submit"}
-              variant="contained"
-              disabled={!isDirty}
-            >
-              {loading ? <CircularProgress size={24} sx={{color:"green"}}/> : "Update"}
-            </Button>
+            <Grid item>
+              <Button
+                sx={{
+                  backgroundColor: "#000",
+                  color: "#fff",
+                  transition: "background-color 0.2s, color 0.2s",
+                  "&:hover": { backgroundColor: "#fff", color: "#000" },
+                }}
+                type={"submit"}
+                variant="contained"
+                disabled={!isDirty}
+              >
+                {loading ? (
+                  <CircularProgress size={24} sx={{ color: "green" }} />
+                ) : (
+                  "Update"
+                )}
+              </Button>
+            </Grid>
           </Grid>
-        </Grid>
-      </form>
+        </form>
+      </Grid>
       {error && (
         <Grid
           item
@@ -125,7 +131,7 @@ const Profile = () => {
       )}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000} // Автоматическое скрытие через 3 секунды
+        autoHideDuration={3000} 
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >

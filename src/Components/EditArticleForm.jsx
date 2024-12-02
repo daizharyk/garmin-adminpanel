@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   FormControl,
+  FormHelperText,
   Grid,
   InputLabel,
   MenuItem,
@@ -44,7 +45,10 @@ const EditArticleForm = ({ onClose, article }) => {
     addition_main: null,
     addition_adaptive: null,
   });
+  console.log(additionalImages.addition_main);
   const [mainImage, setMainImage] = useState(null);
+  // console.log(mainImage);
+
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -58,6 +62,7 @@ const EditArticleForm = ({ onClose, article }) => {
       setValue("text", article.text || "");
       setValue("category", article.category || "");
       setValue("product_title", article.product_title || "");
+
       if (article.image) {
         setMainImage(article.image || null);
       }
@@ -185,7 +190,7 @@ const EditArticleForm = ({ onClose, article }) => {
     }));
   };
   const handlerCardImage = (file, fileKey) => {
-    if (fileKey === "main") {
+    if (fileKey === "mainImage") {
       setMainImage(file);
     }
   };
@@ -274,7 +279,7 @@ const EditArticleForm = ({ onClose, article }) => {
                     ? URL.createObjectURL(mainImage)
                     : mainImage || ""
                 }
-                fileKey="main"
+                fileKey="mainImage"
                 containerStyle={{
                   width: "100%",
                   display: "flex",
@@ -314,9 +319,9 @@ const EditArticleForm = ({ onClose, article }) => {
                       required: "Category is required",
                     })}
                     error={!!errors.category}
-                    defaultValue={article.category}
+                    defaultValue={article?.category}
                   >
-                    <MenuItem value="Smartwatches">Smartwatches</MenuItem>
+                    <MenuItem value="Smartwatche">Smartwatche</MenuItem>
                   </Select>
 
                   {errors.category && (
@@ -666,7 +671,11 @@ const EditArticleForm = ({ onClose, article }) => {
                   width: "100%",
                   height: additionalImages?.addition_main ? "60px" : "150px",
                 }}
-                buttonText="Upload an additional main image"
+                buttonText={
+                  additionalImages?.addition_main
+                    ? "Change an additional main image"
+                    : "Upload an additional main image"
+                }
                 fullWidth
               />
             </Grid>
@@ -687,7 +696,11 @@ const EditArticleForm = ({ onClose, article }) => {
                     ? "60px"
                     : "150px",
                 }}
-                buttonText="Upload an additional adaptive image"
+                buttonText={
+                  additionalImages?.addition_main
+                    ? "Change an additional adaptive image"
+                    : "Upload an additional adaptive image"
+                }
                 fullWidth
               />
             </Grid>

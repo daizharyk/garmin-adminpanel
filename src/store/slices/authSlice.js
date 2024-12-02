@@ -26,20 +26,26 @@ export const slice = createSlice({
       state.user = null;
       localStorage.removeItem("user");
     },
+    clearError: (state) => {
+      state.error = null;
+    },
   },
 
   extraReducers: (builder) => {
     builder.addCase(loginUser.fulfilled, (state, action) => {
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
+      state.error = null;
     });
     builder.addCase(registerUser.fulfilled, (state, action) => {
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
+      state.error = null;
     });
     builder.addCase(updateUser.fulfilled, (state, action) => {
       state.user = { ...state.user, ...action.payload };
       localStorage.setItem("user", JSON.stringify(state.user));
+      state.error = null;
     });
     builder.addCase(updateUser.rejected, (state, action) => {
       state.error = action.error.message;

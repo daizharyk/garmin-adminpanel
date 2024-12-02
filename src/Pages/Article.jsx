@@ -8,11 +8,9 @@ import Spinner from "../Common/spinner";
 import ImageCarousel from "../Components/ImageCarusel";
 
 const Article = () => {
-  const baseImageUrl = "https://i.ibb.co.com/";
   const { id } = useParams();
   const dispatch = useDispatch();
   const { readedArticle, loading } = useSelector((state) => state.articles);
-
 
   useEffect(() => {
     if (!readedArticle || readedArticle._id !== id) {
@@ -22,6 +20,10 @@ const Article = () => {
   if (loading) {
     return <Spinner />;
   }
+
+
+
+  
   if (readedArticle) {
     return (
       <Grid sx={{ width: "100%" }}>
@@ -35,9 +37,7 @@ const Article = () => {
           <Grid item>
             {readedArticle?.carousel_images?.length > 0 ? (
               <ImageCarousel
-                images={readedArticle.carousel_images.map(
-                  (img) => `${baseImageUrl}${img}`
-                )}
+                images={readedArticle.carousel_images.map((img) => img)}
               />
             ) : null}
           </Grid>
@@ -79,7 +79,8 @@ const Article = () => {
                 variant="h4"
                 sx={{
                   position: "absolute",
-                  top: "50%",
+                  width:"100%",
+                  top: "40%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
                   color: "#fff",
@@ -92,6 +93,7 @@ const Article = () => {
                 sx={{
                   position: "absolute",
                   top: "60%",
+                  width:"100%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
                   color: "#fff",
@@ -101,11 +103,18 @@ const Article = () => {
               </Typography>
               <Box
                 component="img"
-                src={`${baseImageUrl}${readedArticle.banner_text?.banner_images.main_banner || ""}`}
+                src={readedArticle.banner_text?.banner_images?.main_banner || ""}
                 alt="Image 1"
                 sx={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
               />
             </Box>
+              <Box
+                component="img"
+                src={readedArticle.banner_text?.banner_images?.adaptive_banner || ""}
+                alt="Image 1"
+                sx={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
+              />
+           
           </Grid>
           <Grid item xs={12} sm={8} md={6} sx={{ padding: 0, margin: 0 }}>
             <Box display="flex" justifyContent="center" sx={{ width: "100%" }}>
@@ -124,11 +133,10 @@ const Article = () => {
             </Box>
           </Grid>
 
-          {/* Третий блок с изображением */}
           <Grid item xs={12} sm={8} md={6}>
             <Box
               component="img"
-              src={`${baseImageUrl}${readedArticle.additional_images?.main_image || ""}`}
+              src={readedArticle.additional_images?.main_image || ""}
               alt="Image 2"
               sx={{ width: "100%" }}
             />
@@ -150,17 +158,20 @@ const Article = () => {
                 <Box
                   sx={{
                     width: "100%",
-                    padding: 1, // Уменьшите padding для уменьшения размера
+                    padding: 1,
                   }}
                 >
                   <Box
                     component="img"
-                    src={`${baseImageUrl}${feature.image}`}
+                    src={feature.image}
                     alt={feature.title}
                     sx={{
                       width: "100%",
                       maxWidth: "400px",
                       height: "auto",
+                      display: "block",
+                      marginLeft: "auto",
+                      marginRight: "auto",
                     }}
                   />
                   <Typography

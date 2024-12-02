@@ -72,7 +72,6 @@ const Layout = ({ children, window }) => {
             </ListItemButton>
           </ListItem>
         ))}
-
         {user && (
           <ListItem disablePadding sx={{ color: "#000" }}>
             <ListItemButton onClick={handleLogout} sx={{ textAlign: "center" }}>

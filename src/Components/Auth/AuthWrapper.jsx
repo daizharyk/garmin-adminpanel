@@ -6,12 +6,13 @@ import Login from "./Login";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate, useNavigate } from "react-router-dom";
 
-
 const AuthWrapper = () => {
   const [type, setType] = useState("login");
+  const dispatch = useDispatch();
 
   const typeChangeHandler = () => {
     setType((prev) => (prev === "login" ? "register" : "login"));
+    dispatch(clearError());
   };
 
   const user = useSelector((state) => state.auth.user);
@@ -19,8 +20,6 @@ const AuthWrapper = () => {
   if (user) {
     return <Navigate replace to="/" />;
   }
-
-
 
   return (
     <PageWrapper title={type === "login" ? "Login" : "Register"}>
@@ -30,17 +29,14 @@ const AuthWrapper = () => {
         justifyContent="center"
         alignItems="center"
         flexDirection="column"
+        
         spacing={4}
         xs={12}
         md={6}
         lg={4}
       >
         <Grid item width={"100%"}>
-          {type === "login" ? (
-            <Login />
-          ) : (
-            <Register  />
-          )}
+          {type === "login" ? <Login /> : <Register />}
         </Grid>
         <Grid container item flexDirection={"column"} alignItems={"center"}>
           <Grid item>
