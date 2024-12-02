@@ -4,7 +4,7 @@ import { Box, Grid, Grow, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyArticleById } from "../store/slices/articlesSlice";
-import Spinner from "../Common/spinner";
+import Spinner from "../Common/Spinnerr";
 import ImageCarousel from "../Components/ImageCarusel";
 
 const Article = () => {
