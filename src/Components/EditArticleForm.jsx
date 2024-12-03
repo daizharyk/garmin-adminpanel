@@ -252,10 +252,13 @@ const EditArticleForm = ({ onClose, article }) => {
     <Backdrop open={true} onClick={onClose} sx={{ zIndex: 1000 }}>
       <Paper
         sx={{
-          p: 4,
+          p: 2,
           borderRadius: "0",
           maxHeight: "80vh",
-          maxWidth:"80vw",
+          maxWidth: {
+            xs: "100%", 
+            sm: "80vw", 
+          },
           overflowY: "auto",
         }}
         onClick={(e) => e.stopPropagation()}

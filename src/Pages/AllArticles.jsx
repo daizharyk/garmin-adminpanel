@@ -68,7 +68,6 @@ const AllArticles = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-      
           }}
         >
           <Spinner />

@@ -4,9 +4,8 @@ const PageWrapper = ({title , children}) => {
   return (
     <Grid
       container
-      
-      justifyContent={"center"}
-      alignItems={"center"}
+      // justifyContent={"center"}
+      // alignItems={"center"}
       spacing={4}
 
     >
