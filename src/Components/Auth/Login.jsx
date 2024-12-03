@@ -38,14 +38,14 @@ const Login = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "50vh", // Высота на весь экран для центрирования
+        height: "50vh", 
       }}
     >
       <form
         onSubmit={handleSubmit(onLoginHandler)}
         style={{
-          width: "70%", // Длина формы 70%
-          maxWidth: "500px", // Ограничение максимальной ширины
+          width: "85%", 
+          maxWidth: "500px", 
           padding: "20px",
           backgroundColor: "#f9f9f9",
           borderRadius: "8px",

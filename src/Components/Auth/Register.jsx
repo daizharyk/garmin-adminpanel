@@ -45,7 +45,7 @@ const Register = () => {
       <form
         onSubmit={handleSubmit(onRegisterHandler)}
         style={{
-          width: "70%",
+          width: "85%", 
           maxWidth: "600px",
           padding: "20px",
           backgroundColor: "#f9f9f9",

@@ -254,7 +254,7 @@ const EditArticleForm = ({ onClose, article }) => {
         sx={{
           p: 2,
           borderRadius: "0",
-          maxHeight: "80vh",
+          maxHeight: "78vh",
           maxWidth: {
             xs: "100%", 
             sm: "80vw", 
