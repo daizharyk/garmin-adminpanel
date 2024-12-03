@@ -4,6 +4,7 @@ import { login, register, update } from "../../services/userService";
 const initialState = {
   user: JSON.parse(localStorage.getItem("user")) || null,
   error: null,
+  loading: false,
 };
 export const loginUser = createAsyncThunk("auth/login", async (data) => {
   const response = await login(data);
@@ -32,14 +33,22 @@ export const slice = createSlice({
   },
 
   extraReducers: (builder) => {
+    builder.addCase(loginUser.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(loginUser.fulfilled, (state, action) => {
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
+      state.loading = false;
       state.error = null;
+    });
+    builder.addCase(registerUser.pending, (state) => {
+      state.loading = true;
     });
     builder.addCase(registerUser.fulfilled, (state, action) => {
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
+      state.loading = false;
       state.error = null;
     });
     builder.addCase(updateUser.fulfilled, (state, action) => {

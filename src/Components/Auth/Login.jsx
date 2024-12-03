@@ -2,10 +2,10 @@ import { Box, Button, Grid, Paper, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../store/slices/authSlice";
 import CloseButton from "../CloseButton";
-
+import Spinner from "../../Common/Spinnerr";
 const Login = () => {
   const {
     register,
@@ -16,7 +16,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [loginError, setLoginError] = useState("");
   const [showError, setShowError] = useState(true);
-
+  const { loading} = useSelector((state) => state.auth);
   const onLoginHandler = async (data) => {
     try {
       await dispatch(loginUser(data)).unwrap();
@@ -130,8 +130,9 @@ const Login = () => {
               }}
               type={"submit"}
               variant="contained"
+              disabled={loading}
             >
-              Login
+              {loading ? <Spinner /> : "Login"}
             </Button>
           </Grid>
         </Grid>

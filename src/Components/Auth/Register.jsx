@@ -3,8 +3,9 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { register as userRegister } from "../../services/userService";
 import { loginUser } from "../../store/slices/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../../Common/Spinnerr";
 
 const Register = () => {
   const {
@@ -12,6 +13,7 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const { loading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
@@ -121,7 +123,7 @@ const Register = () => {
               type={"submit"}
               variant="contained"
             >
-              Register
+              {loading ? <Spinner /> : "Register"}
             </Button>
           </Grid>
         </Grid>

@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addArticle, updateArticle } from "../store/slices/articlesSlice";
 
 import ImageCarouselUploader from "./ImageCarouselUploader";
@@ -255,6 +255,7 @@ const EditArticleForm = ({ onClose, article }) => {
           p: 4,
           borderRadius: "0",
           maxHeight: "80vh",
+          maxWidth:"80vw",
           overflowY: "auto",
         }}
         onClick={(e) => e.stopPropagation()}
