@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addArticle, updateArticle } from "../store/slices/articlesSlice";
 
 import ImageCarouselUploader from "./ImageCarouselUploader";
-import AddImageBtn from "./addImageBtn";
+import AddImageBtn from "./AddImageBtn";
 
 const EditArticleForm = ({ onClose, article }) => {
   console.log("Received article in EditArticleForm:", article);
