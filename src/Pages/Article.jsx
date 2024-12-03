@@ -21,9 +21,6 @@ const Article = () => {
     return <Spinner />;
   }
 
-
-
-  
   if (readedArticle) {
     return (
       <Grid sx={{ width: "100%" }}>
@@ -79,7 +76,7 @@ const Article = () => {
                 variant="h4"
                 sx={{
                   position: "absolute",
-                  width:"100%",
+                  width: "100%",
                   top: "40%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
@@ -93,7 +90,7 @@ const Article = () => {
                 sx={{
                   position: "absolute",
                   top: "60%",
-                  width:"100%",
+                  width: "100%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
                   color: "#fff",
@@ -103,18 +100,13 @@ const Article = () => {
               </Typography>
               <Box
                 component="img"
-                src={readedArticle.banner_text?.banner_images?.main_banner || ""}
+                src={
+                  readedArticle.banner_text?.banner_images?.main_banner || ""
+                }
                 alt="Image 1"
                 sx={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
               />
             </Box>
-              <Box
-                component="img"
-                src={readedArticle.banner_text?.banner_images?.adaptive_banner || ""}
-                alt="Image 1"
-                sx={{ width: "100%", maxHeight: "400px", objectFit: "cover" }}
-              />
-           
           </Grid>
           <Grid item xs={12} sm={8} md={6} sx={{ padding: 0, margin: 0 }}>
             <Box display="flex" justifyContent="center" sx={{ width: "100%" }}>
