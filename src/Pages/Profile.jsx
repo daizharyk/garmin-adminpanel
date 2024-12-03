@@ -104,7 +104,7 @@ const Profile = () => {
                 }}
                 type={"submit"}
                 variant="contained"
-                disabled={loading}
+                disabled={!isDirty || loading}
               >
                 {loading ? <Spinner /> : "Update"}
               </Button>
