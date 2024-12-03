@@ -122,6 +122,7 @@ const Register = () => {
               }}
               type={"submit"}
               variant="contained"
+              disabled={loading}
             >
               {loading ? <Spinner /> : "Register"}
             </Button>
