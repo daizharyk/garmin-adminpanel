@@ -13,7 +13,7 @@ const PageWrapper = ({title , children}) => {
        <Grid item container justifyContent={"center"}>
         <Typography variant="h4">{title}</Typography>
       </Grid>
-      <Grid  container item justifyContent={'center'}>
+      <Grid  container item >
         {children}
       </Grid>
     </Grid>

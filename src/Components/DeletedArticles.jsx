@@ -20,7 +20,7 @@ import {
 
 const DeletedArticles = ({ isOpen, handleClose }) => {
   const dispatch = useDispatch();
-  const { userArticles, loading } = useSelector((state) => state.articles);
+  const { userArticles } = useSelector((state) => state.articles);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingArticleId, setLoadingArticleId] = useState(null);
   useEffect(() => {
