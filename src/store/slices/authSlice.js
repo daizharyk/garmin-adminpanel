@@ -51,9 +51,13 @@ export const slice = createSlice({
       state.loading = false;
       state.error = null;
     });
+    builder.addCase(updateUser.pending, (state, action) => {
+      state.loading = true;
+    });
     builder.addCase(updateUser.fulfilled, (state, action) => {
       state.user = { ...state.user, ...action.payload };
       localStorage.setItem("user", JSON.stringify(state.user));
+      state.loading = false;
       state.error = null;
     });
     builder.addCase(updateUser.rejected, (state, action) => {

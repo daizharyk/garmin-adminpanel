@@ -11,7 +11,7 @@ import {
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUser } from "../store/slices/authSlice";
-
+import Spinner from "../Common/Spinnerr";
 const Profile = () => {
   const {
     register,
@@ -25,7 +25,8 @@ const Profile = () => {
   const dispatch = useDispatch();
   const [isDirty, setIsDerty] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { loading } = useSelector((state) => state.auth);
+
   useEffect(() => {
     if (user) {
       setValue("name", user.name);
@@ -45,7 +46,6 @@ const Profile = () => {
   }, [currentName, currenEmail, user]);
 
   const onUpdateHandler = async (data) => {
-    setLoading(true);
     try {
       const updatedUser = await dispatch(updateUser(data)).unwrap();
       setValue("name", updatedUser.name);
@@ -53,8 +53,6 @@ const Profile = () => {
       setOpenSnackbar(true);
     } catch (error) {
       console.log("error");
-    } finally {
-      setLoading(false);
     }
   };
   const handleCloseSnackbar = () => {
@@ -106,13 +104,9 @@ const Profile = () => {
                 }}
                 type={"submit"}
                 variant="contained"
-                disabled={!isDirty}
+                disabled={loading}
               >
-                {loading ? (
-                  <CircularProgress size={24} sx={{ color: "green" }} />
-                ) : (
-                  "Update"
-                )}
+                {loading ? <Spinner /> : "Update"}
               </Button>
             </Grid>
           </Grid>
@@ -131,7 +125,7 @@ const Profile = () => {
       )}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={3000} 
+        autoHideDuration={3000}
         onClose={handleCloseSnackbar}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
