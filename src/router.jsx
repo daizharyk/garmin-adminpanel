@@ -22,10 +22,6 @@ const protectedRoutes = [
     path: "/profile",
     element: <Profile />,
   },
-  {
-    path: "/deleted",
-    element: <DeletedArticles />,
-  },
 ];
 
 const router = createBrowserRouter(
