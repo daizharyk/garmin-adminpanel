@@ -16,7 +16,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const [loginError, setLoginError] = useState("");
   const [showError, setShowError] = useState(true);
-  const { loading} = useSelector((state) => state.auth);
+  const { loading, error } = useSelector((state) => state.auth);
   const onLoginHandler = async (data) => {
     try {
       await dispatch(loginUser(data)).unwrap();
@@ -38,14 +38,14 @@ const Login = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        height: "50vh", 
+        height: "50vh",
       }}
     >
       <form
         onSubmit={handleSubmit(onLoginHandler)}
         style={{
-          width: "85%", 
-          maxWidth: "500px", 
+          width: "85%",
+          maxWidth: "500px",
           padding: "20px",
           backgroundColor: "#f9f9f9",
           borderRadius: "8px",

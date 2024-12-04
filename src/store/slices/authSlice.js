@@ -42,9 +42,14 @@ export const slice = createSlice({
       state.loading = false;
       state.error = null;
     });
+    builder.addCase(loginUser.rejected, (state, action) => {
+      state.loading = false;
+    });
+
     builder.addCase(registerUser.pending, (state) => {
       state.loading = true;
     });
+
     builder.addCase(registerUser.fulfilled, (state, action) => {
       state.user = action.payload;
       localStorage.setItem("user", JSON.stringify(action.payload));
@@ -64,6 +69,7 @@ export const slice = createSlice({
       state.error = action.error.message;
     });
     builder.addCase(registerUser.rejected, (state, action) => {
+      state.loading = false;
       state.error = action.error.message;
     });
   },

@@ -18,13 +18,15 @@ const MyArticles = () => {
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
+  console.log("user", user);
+  
   const [loadingArticleId, setLoadingArticleId] = useState(null);
 
   useEffect(() => {
     if (userArticles.length === 0) {
       dispatch(getMyArticles());
     }
-  }, []);
+  }, [dispatch]);
   useEffect(() => {
     const clearData = async () => {
       if (!user) {

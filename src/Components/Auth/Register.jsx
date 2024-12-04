@@ -1,8 +1,7 @@
 import { Alert, Box, Button, Grid, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { register as userRegister } from "../../services/userService";
-import { loginUser } from "../../store/slices/authSlice";
+import { loginUser, registerUser } from "../../store/slices/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../Common/Spinnerr";
@@ -13,26 +12,24 @@ const Register = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const { loading } = useSelector((state) => state.auth);
+  const { loading, error, user } = useSelector((state) => state.auth);
+  console.log("user", user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState("");
   const onRegisterHandler = async (data) => {
     try {
-      const res = await userRegister(data);
-      localStorage.setItem("user", JSON.stringify(res));
-      const { email, password } = data;
-      await dispatch(loginUser({ email, password }));
-      navigate("/");
-      console.log(res);
+      const registerResult = await dispatch(registerUser(data));
+      if (registerUser.fulfilled.match(registerResult)) {
+        const loginData = { email: data.email, password: data.password };
+        const loginResult = await dispatch(loginUser(loginData));
+        if (loginUser.fulfilled.match(loginResult)) {
+          navigate("/");
+        }
+      }
     } catch (error) {
-      console.log(error?.response?.data);
-      setErrorMessage(
-        error?.response?.data?.message || "Регистрация не удалась"
-      );
+      console.error(error);
     }
   };
-
   return (
     <Box
       sx={{
@@ -45,7 +42,7 @@ const Register = () => {
       <form
         onSubmit={handleSubmit(onRegisterHandler)}
         style={{
-          width: "85%", 
+          width: "85%",
           maxWidth: "600px",
           padding: "20px",
           backgroundColor: "#f9f9f9",
@@ -53,9 +50,15 @@ const Register = () => {
           boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
-        {errorMessage && (
-          <Grid item sx={{ margin: "20px 0" }} width={"100%"}>
-            <Alert severity="error">{errorMessage}</Alert>
+        {error && (
+          <Grid
+            item
+            container
+            justifyContent={"center"}
+            alignItems={"center"}
+            sx={{ padding: "20px" }}
+          >
+            <Alert severity="error">{error}</Alert>
           </Grid>
         )}
         <Grid

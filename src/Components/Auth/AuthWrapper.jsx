@@ -8,11 +8,9 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 const AuthWrapper = () => {
   const [type, setType] = useState("login");
-  const dispatch = useDispatch();
 
   const typeChangeHandler = () => {
     setType((prev) => (prev === "login" ? "register" : "login"));
-    dispatch(clearError());
   };
 
   const user = useSelector((state) => state.auth.user);
@@ -26,10 +24,10 @@ const AuthWrapper = () => {
       <Grid
         container
         item
+
         justifyContent="center"
         alignItems="center"
         flexDirection="column"
-        
         spacing={4}
         xs={12}
         md={6}

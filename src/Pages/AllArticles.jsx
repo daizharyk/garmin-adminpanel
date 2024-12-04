@@ -20,7 +20,7 @@ const AllArticles = () => {
     if (allArticles.length === 0) {
       dispatch(getAllArticles());
     }
-  }, [dispatch]);
+  }, []);
 
   return (
     <PageWrapper title={"All products"}>
@@ -41,16 +41,17 @@ const AllArticles = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           sx={{
-            width: "190px",
-            transition: "width 0.2s ease-in-out",
             marginBottom: "20px",
+            transition: "all 0.3s ease-in-out", 
             "& .MuiOutlinedInput-root": {
               borderRadius: "30px",
+              transition: "all 0.3s ease-in-out", 
               "&:hover fieldset": {},
               "&.Mui-focused fieldset": {
-                borderColor: "#003049",
+                borderColor: "#003049", 
               },
-              transition: "width 0.3s ease-in-out",
+              width: searchQuery.length > 0 ? "300px" : "190px", 
+              transformOrigin: "center", 
             },
           }}
           InputProps={{
@@ -62,19 +63,25 @@ const AllArticles = () => {
           }}
         />
       </Box>
-      {loading ? (
+      {loading && (
         <Box
           sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            zIndex: 9999,
           }}
         >
-          <Spinner />
+          <Spinner color="#ffff" size={60} />
         </Box>
-      ) : (
-        <ArticleList items={filteredArticles} />
       )}
+      <ArticleList items={filteredArticles} />
     </PageWrapper>
   );
 };
