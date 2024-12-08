@@ -42,16 +42,16 @@ const AllArticles = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           sx={{
             marginBottom: "20px",
-            transition: "all 0.3s ease-in-out", 
+            transition: "all 0.3s ease-in-out",
             "& .MuiOutlinedInput-root": {
               borderRadius: "30px",
-              transition: "all 0.3s ease-in-out", 
+              transition: "all 0.3s ease-in-out",
               "&:hover fieldset": {},
               "&.Mui-focused fieldset": {
-                borderColor: "#003049", 
+                borderColor: "#003049",
               },
-              width: searchQuery.length > 0 ? "300px" : "190px", 
-              transformOrigin: "center", 
+              width: searchQuery.length > 0 ? "300px" : "190px",
+              transformOrigin: "center",
             },
           }}
           InputProps={{
