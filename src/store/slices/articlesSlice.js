@@ -82,7 +82,6 @@ export const slice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(clearArticles, (state) => {
       state.loading = false;
-
       state.userArticles = [];
       state.readedArticle = null;
     });

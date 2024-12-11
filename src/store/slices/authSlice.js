@@ -66,6 +66,7 @@ export const slice = createSlice({
       state.error = null;
     });
     builder.addCase(updateUser.rejected, (state, action) => {
+      state.loading = false;
       state.error = action.error.message;
     });
     builder.addCase(registerUser.rejected, (state, action) => {
