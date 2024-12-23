@@ -2,8 +2,10 @@ import {
   Backdrop,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   Grid,
   InputLabel,
@@ -22,7 +24,7 @@ import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./AddImageBtn";
 
 const EditArticleForm = ({ onClose, article }) => {
-  console.log("Received article in EditArticleForm:", article);
+  // console.log("Received article in EditArticleForm:", article);
 
   const {
     register,
@@ -45,12 +47,27 @@ const EditArticleForm = ({ onClose, article }) => {
     addition_main: null,
     addition_adaptive: null,
   });
-  console.log(additionalImages.addition_main);
+
   const [mainImage, setMainImage] = useState(null);
-  // console.log(mainImage);
 
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [features, setFeatures] = useState({
+    touchscreen: false,
+    new_forerunners: false,
+    entry_level_running: false,
+    advanced_running: false,
+    elite_running: false,
+    touchscreen_and_buttons: false,
+    color_screen: false,
+    solar_charging: false,
+    flashlight: false,
+    buttons: false,
+    amoled_display: false,
+    heart_rate_monitors: false,
+  });
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -97,6 +114,22 @@ const EditArticleForm = ({ onClose, article }) => {
           addition_adaptive: article.additional_images.adaptive_image || null,
         });
       }
+
+      setFeatures({
+        touchscreen: article.features?.touchscreen || false,
+        new_forerunners: article.features?.new_forerunners || false,
+        entry_level_running: article.features?.entry_level_running || false,
+        advanced_running: article.features?.advanced_running || false,
+        elite_running: article.features?.elite_running || false,
+        touchscreen_and_buttons:
+          article.features?.touchscreen_and_buttons || false,
+        color_screen: article.features?.color_screen || false,
+        solar_charging: article.features?.solar_charging || false,
+        flashlight: article.features?.flashlight || false,
+        buttons: article.features?.buttons || false,
+        amoled_display: article.features?.amoled_display || false,
+        heart_rate_monitors: article.features?.heart_rate_monitors || false,
+      });
     }
   }, [article, setValue, getValues]);
 
@@ -148,6 +181,10 @@ const EditArticleForm = ({ onClose, article }) => {
       formData.append("banner_title", data.banner_text.title);
       formData.append("banner_text", data.banner_text.text);
       formData.append("video_url", data.video_section.video_url);
+
+      for (const [key, value] of Object.entries(features)) {
+        formData.append(`features[${key}]`, value);
+      }
 
       if (Array.isArray(watchFeatures)) {
         watchFeatures.forEach((feature, index) => {
@@ -248,6 +285,14 @@ const EditArticleForm = ({ onClose, article }) => {
     };
   }, [previewImage]);
 
+  const handleChange = (event) => {
+    const { name, checked } = event.target;
+    setFeatures((prev) => ({
+      ...prev,
+      [name]: checked,
+    }));
+  };
+
   return (
     <Backdrop open={true} onClick={onClose} sx={{ zIndex: 1000 }}>
       <Paper
@@ -256,8 +301,8 @@ const EditArticleForm = ({ onClose, article }) => {
           borderRadius: "0",
           maxHeight: "78vh",
           maxWidth: {
-            xs: "100%", 
-            sm: "80vw", 
+            xs: "100%",
+            sm: "80vw",
           },
           overflowY: "auto",
         }}
@@ -446,6 +491,38 @@ const EditArticleForm = ({ onClose, article }) => {
                   </Grid>
                 </Grid>
               </Grid>
+            </Grid>
+          </Grid>
+          <Grid
+            item
+            sx={{
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              backgroundColor: "#edf2f4",
+              padding: "16px",
+              marginBottom: "20px",
+            }}
+          >
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <Typography variant="h6">Select Features:</Typography>
+              </Grid>
+              {Object.keys(features).map((key) => (
+                <Grid item xs={12} sm={6} md={4} key={key}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name={key}
+                        checked={features[key]}
+                        onChange={handleChange}
+                      />
+                    }
+                    label={key
+                      .replace(/_/g, " ")
+                      .replace(/\b\w/g, (char) => char.toUpperCase())} // Форматирование метки
+                  />
+                </Grid>
+              ))}
             </Grid>
           </Grid>
           <Grid

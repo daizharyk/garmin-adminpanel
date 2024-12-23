@@ -52,6 +52,7 @@ const ArticleList = ({
               category={article.category}
               showDeleted={article.showDeleted}
               loadingArticleId={loadingArticleId}
+              features={article.features}
             />
           </Grid>
         );
