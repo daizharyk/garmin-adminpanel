@@ -22,6 +22,7 @@ import { addArticle, updateArticle } from "../store/slices/articlesSlice";
 
 import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./AddImageBtn";
+import { getSmartwatchModels } from "../services/smartWatchService";
 
 const EditArticleForm = ({ onClose, article }) => {
   // console.log("Received article in EditArticleForm:", article);
@@ -52,7 +53,8 @@ const EditArticleForm = ({ onClose, article }) => {
 
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  const [models, setModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState("");
   const [features, setFeatures] = useState({
     touchscreen: false,
     new_forerunners: false,
@@ -69,6 +71,20 @@ const EditArticleForm = ({ onClose, article }) => {
   });
 
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const smartwatchModels = await getSmartwatchModels();
+        console.log("smartwatchModels", smartwatchModels);
+
+        setModels(smartwatchModels);
+      } catch (error) {
+        console.error("Error fetching smartwatch models:", error);
+      }
+    };
+    fetchModels();
+  }, []);
 
   useEffect(() => {
     if (article) {
@@ -380,6 +396,32 @@ const EditArticleForm = ({ onClose, article }) => {
                   )}
                 </FormControl>
               </Grid>
+              <Grid item width={"100%"}>
+                <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
+                  <InputLabel>Model</InputLabel>
+                  <Select
+                    label="Model"
+                    {...register("model", {
+                      required: "Model is required",
+                    })}
+                    error={!!errors.model}
+                    defaultValue=""
+                  >
+                    {models.map((model, index) => (
+                      <MenuItem key={index} value={model.name}>
+                        {model.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+
+                  {errors.model && (
+                    <FormHelperText error>
+                      {errors.model.message}
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </Grid>
+
               <Grid item width={"100%"}>
                 <TextField
                   label="Text"

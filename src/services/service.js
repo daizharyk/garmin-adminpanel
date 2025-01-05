@@ -31,12 +31,17 @@ export async function deleteRequest(url) {
   }
   return await res.data;
 }
-export async function getRequest(url) {
-  const res = await axios.get(url);
-  if (res.status !== 200 && res.status !== 201) {
-    throw res;
+export async function getRequest(url, headers = {}) {
+  try {
+    const res = await axios.get(url, { headers });
+    if (res.status !== 200 && res.status !== 201) {
+      throw new Error(`Request failed with status: ${res.status}`);
+    }
+    return res.data;
+  } catch (error) {
+    console.error("Error in GET request:", error);
+    throw error;
   }
-  return await res.data;
 }
 
 export async function patchRequest(url, body = {}) {

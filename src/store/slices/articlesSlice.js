@@ -75,6 +75,9 @@ export const deleteForceArticle = createAsyncThunk(
     return response;
   }
 );
+export const getSmartwatchesModel = createAsyncThunk("articleModels/getModels", async () =>{
+
+})
 export const slice = createSlice({
   name: "articles",
   initialState,
