@@ -18,7 +18,6 @@ const ArticleList = ({
     return <p>No articles available</p>;
   }
 
-  
   const filteredItems = showDeleted
     ? items
     : items.filter((item) => !item.isDeleted);
@@ -39,6 +38,7 @@ const ArticleList = ({
               image={article.image}
               price={article.price}
               status={article.status}
+              model={article.model}
               color={article.color}
               banner_title={article.banner_title}
               banner_text={article.banner_text}

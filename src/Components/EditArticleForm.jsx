@@ -4,6 +4,10 @@ import {
   Button,
   Checkbox,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -22,7 +26,10 @@ import { addArticle, updateArticle } from "../store/slices/articlesSlice";
 
 import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./AddImageBtn";
-import { getSmartwatchModels } from "../services/smartWatchService";
+import {
+  creatSmartwatchModel,
+  getSmartwatchModels,
+} from "../services/smartWatchService";
 
 const EditArticleForm = ({ onClose, article }) => {
   // console.log("Received article in EditArticleForm:", article);
@@ -50,10 +57,11 @@ const EditArticleForm = ({ onClose, article }) => {
   });
 
   const [mainImage, setMainImage] = useState(null);
-
+  const [openDialog, setOpenDialog] = useState(false);
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
   const [models, setModels] = useState([]);
+  const [newModel, setNewModel] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
   const [features, setFeatures] = useState({
     touchscreen: false,
@@ -76,8 +84,6 @@ const EditArticleForm = ({ onClose, article }) => {
     const fetchModels = async () => {
       try {
         const smartwatchModels = await getSmartwatchModels();
-        console.log("smartwatchModels", smartwatchModels);
-
         setModels(smartwatchModels);
       } catch (error) {
         console.error("Error fetching smartwatch models:", error);
@@ -95,7 +101,7 @@ const EditArticleForm = ({ onClose, article }) => {
       setValue("text", article.text || "");
       setValue("category", article.category || "");
       setValue("product_title", article.product_title || "");
-
+      setValue("model", article.model || "");
       if (article.image) {
         setMainImage(article.image || null);
       }
@@ -197,7 +203,7 @@ const EditArticleForm = ({ onClose, article }) => {
       formData.append("banner_title", data.banner_text.title);
       formData.append("banner_text", data.banner_text.text);
       formData.append("video_url", data.video_section.video_url);
-
+      formData.append("model", data.model);
       for (const [key, value] of Object.entries(features)) {
         formData.append(`features[${key}]`, value);
       }
@@ -259,6 +265,15 @@ const EditArticleForm = ({ onClose, article }) => {
       ...prevState,
       [fileKey]: file,
     }));
+  };
+
+  const handleAddModel = async () => {
+    if (newModel.trim()) {
+      const addedModel = await creatSmartwatchModel(newModel.trim());
+      setModels((prevModels) => [...prevModels, addedModel]);
+      setNewModel("");
+      setOpenDialog(false);
+    }
   };
 
   const handleAddFeature = (event) => {
@@ -420,6 +435,40 @@ const EditArticleForm = ({ onClose, article }) => {
                     </FormHelperText>
                   )}
                 </FormControl>
+                <Button
+                  sx={{ marginTop: 2 }}
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setOpenDialog(true)}
+                >
+                  Add Model
+                </Button>
+                <Dialog
+                  fullWidth
+                  open={openDialog}
+                  onClose={() => setOpenDialog(false)}
+                >
+                  <DialogTitle>Add New Model</DialogTitle>
+                  <DialogContent sx={("margin: 10px", "padding: 10px")}>
+                    <TextField
+                      fullWidth
+                      value={newModel}
+                      onChange={(e) => setNewModel(e.target.value)}
+                      label="Model Name"
+                    />
+                  </DialogContent>
+                  <DialogActions>
+                    <Button
+                      onClick={() => setOpenDialog(false)}
+                      color="secondary"
+                    >
+                      Cancel
+                    </Button>
+                    <Button onClick={handleAddModel} color="primary">
+                      Add
+                    </Button>
+                  </DialogActions>
+                </Dialog>
               </Grid>
 
               <Grid item width={"100%"}>
