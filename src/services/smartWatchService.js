@@ -12,3 +12,13 @@ export async function creatSmartwatchModel(modelName) {
   });
   return smartwatchModels;
 }
+export async function getModelById(modelId) {
+  try {
+    const model = await getRequest(`${API_URL}/models/${modelId}`); // Предполагается эндпоинт API
+
+    return model;
+  } catch (error) {
+    console.error("Error fetching model by ID:", error);
+    return null;
+  }
+}

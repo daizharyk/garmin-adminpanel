@@ -28,11 +28,12 @@ import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./AddImageBtn";
 import {
   creatSmartwatchModel,
+  getModelById,
   getSmartwatchModels,
 } from "../services/smartWatchService";
 
 const EditArticleForm = ({ onClose, article }) => {
-  // console.log("Received article in EditArticleForm:", article);
+  console.log("Received article in EditArticleForm:", article);
 
   const {
     register,
@@ -81,18 +82,6 @@ const EditArticleForm = ({ onClose, article }) => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const fetchModels = async () => {
-      try {
-        const smartwatchModels = await getSmartwatchModels();
-        setModels(smartwatchModels);
-      } catch (error) {
-        console.error("Error fetching smartwatch models:", error);
-      }
-    };
-    fetchModels();
-  }, []);
-
-  useEffect(() => {
     if (article) {
       setValue("name", article.name || "");
       setValue("price", article.price || null);
@@ -101,7 +90,7 @@ const EditArticleForm = ({ onClose, article }) => {
       setValue("text", article.text || "");
       setValue("category", article.category || "");
       setValue("product_title", article.product_title || "");
-      setValue("model", article.model || "");
+
       if (article.image) {
         setMainImage(article.image || null);
       }
@@ -237,6 +226,36 @@ const EditArticleForm = ({ onClose, article }) => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchModels = async () => {
+      try {
+        const smartwatchModels = await getSmartwatchModels();
+        setModels(smartwatchModels);
+      } catch (error) {
+        console.error("Error fetching smartwatch models:", error);
+      }
+    };
+    fetchModels();
+  }, []);
+
+  useEffect(() => {
+    const fetchModelName = async () => {
+      try {
+        if (article.model) {
+          const modelData = await getModelById(article.model);
+          console.log("modelData", modelData);
+
+          setSelectedModel(modelData._id);
+          setValue("model", modelData._id || "");
+        }
+      } catch (error) {
+        console.error("Error fetching model name:", error);
+      }
+    };
+
+    fetchModelName();
+  }, [article.model, setValue]);
 
   const handleFilesChange = (files) => {
     setCarouselImages(files);
@@ -420,10 +439,14 @@ const EditArticleForm = ({ onClose, article }) => {
                       required: "Model is required",
                     })}
                     error={!!errors.model}
-                    defaultValue=""
+                    value={getValues("model") || ""}
+                    onChange={(e) => {
+                      setValue("model", e.target.value);
+                      setSelectedModel(e.target.value);
+                    }}
                   >
-                    {models.map((model, index) => (
-                      <MenuItem key={index} value={model.name}>
+                    {models.map((model) => (
+                      <MenuItem key={model._id} value={model._id}>
                         {model.name}
                       </MenuItem>
                     ))}
