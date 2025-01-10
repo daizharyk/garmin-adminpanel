@@ -27,7 +27,9 @@ import { addArticle, updateArticle } from "../store/slices/articlesSlice";
 import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./AddImageBtn";
 import {
+  creatModelEdition,
   creatSmartwatchModel,
+  getEditionsByModelId,
   getModelById,
   getSmartwatchModels,
 } from "../services/smartWatchService";
@@ -56,14 +58,28 @@ const EditArticleForm = ({ onClose, article }) => {
     addition_main: null,
     addition_adaptive: null,
   });
-
+  const [openEditionDialog, setOpenEditionDialog] = useState(false);
   const [mainImage, setMainImage] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
+
+  // useEffect(() => {
+  //   console.log("Dialog state updated:", openDialog);
+  // }, [openDialog]); // Логируется каждый раз, когда состояние openDialog меняется
+
+  useEffect(() => {
+    console.log("setOpenDialog state updated:", setOpenDialog);
+  }, [setOpenDialog]); // Логируется каждый раз, когда состояние openDialog меняется
+
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
   const [models, setModels] = useState([]);
   const [newModel, setNewModel] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
+  const [modelEditions, setModelEditions] = useState([]);
+  const [selectedEdition, setSelectedEdition] = useState("");
+  const [newEdition, setNewEdition] = useState("");
+  console.log("models", models);
+
   const [features, setFeatures] = useState({
     touchscreen: false,
     new_forerunners: false,
@@ -193,6 +209,7 @@ const EditArticleForm = ({ onClose, article }) => {
       formData.append("banner_text", data.banner_text.text);
       formData.append("video_url", data.video_section.video_url);
       formData.append("model", data.model);
+      formData.append("model_edition", data.model_edition);
       for (const [key, value] of Object.entries(features)) {
         formData.append(`features[${key}]`, value);
       }
@@ -209,6 +226,10 @@ const EditArticleForm = ({ onClose, article }) => {
             formData.append(`watch_features_image_${index}`, feature.file);
           }
         });
+      }
+      console.log("FormData entries:");
+      for (let pair of formData.entries()) {
+        console.log(`${pair[0]}: ${pair[1]}`);
       }
 
       const isEditMode = !!article?._id;
@@ -228,34 +249,70 @@ const EditArticleForm = ({ onClose, article }) => {
   };
 
   useEffect(() => {
-    const fetchModels = async () => {
+    const fetchData = async () => {
       try {
         const smartwatchModels = await getSmartwatchModels();
         setModels(smartwatchModels);
-      } catch (error) {
-        console.error("Error fetching smartwatch models:", error);
-      }
-    };
-    fetchModels();
-  }, []);
 
-  useEffect(() => {
-    const fetchModelName = async () => {
-      try {
-        if (article.model) {
+        if (article) {
           const modelData = await getModelById(article.model);
-          console.log("modelData", modelData);
 
           setSelectedModel(modelData._id);
           setValue("model", modelData._id || "");
+          setModelEditions(modelData.editions || []);
+          if (article.model_edition) {
+            setSelectedEdition(article.model_edition);
+            setValue("model_edition", article.model_edition);
+          }
         }
       } catch (error) {
-        console.error("Error fetching model name:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchModelName();
-  }, [article.model, setValue]);
+    fetchData();
+  }, [article?.model, setValue]);
+
+  const handleModelChange = async (modelId) => {
+    setSelectedModel(modelId);
+    setValue("model", modelId);
+    const selectedModel = models.find((model) => model._id === modelId);
+    if (selectedModel) {
+      setModelEditions(selectedModel.editions);
+    }
+  };
+  const handleEditionChange = (e) => {
+    const selectedEdition = e.target.value;
+    setValue("model_edition", selectedEdition);
+    setSelectedEdition(selectedEdition);
+  };
+
+  const handleAddModel = async () => {
+    if (newModel.trim()) {
+      const addedModel = await creatSmartwatchModel(newModel.trim());
+
+      setModels((prevModels) => [...prevModels, addedModel]);
+      setNewModel("");
+      setOpenDialog(false);
+    }
+  };
+
+  const handleAddEdition = async () => {
+    if (newEdition.trim() && selectedModel) {
+      try {
+        const addedEdition = await creatModelEdition(
+          selectedModel,
+          newEdition.trim()
+        );
+        setModelEditions((prevEditions) => [...prevEditions, addedEdition]),
+  
+        setNewEdition("");
+        setOpenEditionDialog(false);
+      } catch (error) {
+        console.error("Ошибка при добавлении нового издания:", error);
+      }
+    }
+  };
 
   const handleFilesChange = (files) => {
     setCarouselImages(files);
@@ -284,15 +341,6 @@ const EditArticleForm = ({ onClose, article }) => {
       ...prevState,
       [fileKey]: file,
     }));
-  };
-
-  const handleAddModel = async () => {
-    if (newModel.trim()) {
-      const addedModel = await creatSmartwatchModel(newModel.trim());
-      setModels((prevModels) => [...prevModels, addedModel]);
-      setNewModel("");
-      setOpenDialog(false);
-    }
   };
 
   const handleAddFeature = (event) => {
@@ -430,68 +478,249 @@ const EditArticleForm = ({ onClose, article }) => {
                   )}
                 </FormControl>
               </Grid>
-              <Grid item width={"100%"}>
-                <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
-                  <InputLabel>Model</InputLabel>
-                  <Select
-                    label="Model"
-                    {...register("model", {
-                      required: "Model is required",
-                    })}
-                    error={!!errors.model}
-                    value={getValues("model") || ""}
-                    onChange={(e) => {
-                      setValue("model", e.target.value);
-                      setSelectedModel(e.target.value);
+              <Grid
+                width={"100%"}
+                sx={{ display: "flex", flexWrap: "wrap", gap: "20px" }}
+              >
+                <Grid item width={"100%"}>
+                  <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
+                    <InputLabel>Model</InputLabel>
+                    <Select
+                      label="Model"
+                      {...register("model", {
+                        required: "Model is required",
+                      })}
+                      error={!!errors.model}
+                      value={getValues("model") || ""}
+                      onChange={(e) => {
+                        handleModelChange(e.target.value);
+                        // setValue("model", e.target.value);
+                      }}
+                      sx={{
+                        width: "100%",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {models.map((model) => (
+                        <MenuItem
+                          sx={{
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                          }}
+                          key={model._id}
+                          value={model._id}
+                        >
+                          {model.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+
+                    {errors.model && (
+                      <FormHelperText error>
+                        {errors.model.message}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                  <Button
+                    sx={{ marginTop: 2 }}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpenDialog(true)}
+                  >
+                    Add Model
+                  </Button>
+                  <Dialog
+                    fullWidth
+                    open={openDialog}
+                    onClose={() => {
+                      console.log("Cancel clicked");
+                      setOpenDialog(false);
                     }}
                   >
-                    {models.map((model) => (
-                      <MenuItem key={model._id} value={model._id}>
-                        {model.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                    <DialogTitle>Add New Model</DialogTitle>
+                    <DialogContent sx={("margin: 10px", "padding: 10px")}>
+                      <TextField
+                        fullWidth
+                        value={newModel}
+                        onChange={(e) => setNewModel(e.target.value)}
+                        label="Model Name"
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        onClick={() => {
+                          try {
+                            setOpenDialog(false);
+                            console.log("Dialog closed successfully");
+                          } catch (error) {
+                            console.error("Error closing dialog:", error);
+                          }
+                        }}
+                        color="secondary"
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddModel} color="primary">
+                        Add
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </Grid>
+                <Grid item width={"100%"}>
+                  <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
+                    <InputLabel>Model edition</InputLabel>
+                    <Select
+                      label="Model edition"
+                      {...register("model_edition")}
+                      error={!!errors.model_edition}
+                      value={
+                        getValues("model_edition") || selectedEdition || ""
+                      }
+                      onChange={handleEditionChange}
+                      sx={{
+                        width: "100%",
 
-                  {errors.model && (
-                    <FormHelperText error>
-                      {errors.model.message}
-                    </FormHelperText>
-                  )}
-                </FormControl>
-                <Button
-                  sx={{ marginTop: 2 }}
-                  variant="contained"
-                  color="primary"
-                  onClick={() => setOpenDialog(true)}
-                >
-                  Add Model
-                </Button>
-                <Dialog
-                  fullWidth
-                  open={openDialog}
-                  onClose={() => setOpenDialog(false)}
-                >
-                  <DialogTitle>Add New Model</DialogTitle>
-                  <DialogContent sx={("margin: 10px", "padding: 10px")}>
-                    <TextField
-                      fullWidth
-                      value={newModel}
-                      onChange={(e) => setNewModel(e.target.value)}
-                      label="Model Name"
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button
-                      onClick={() => setOpenDialog(false)}
-                      color="secondary"
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                      }}
                     >
-                      Cancel
-                    </Button>
-                    <Button onClick={handleAddModel} color="primary">
-                      Add
-                    </Button>
-                  </DialogActions>
-                </Dialog>
+                      {(modelEditions || []).map((edition) => (
+                        <MenuItem
+                          sx={{
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                          }}
+                          key={edition._id}
+                          value={edition._id}
+                        >
+                          {edition.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.model_edition && (
+                      <FormHelperText error>
+                        {errors.model_edition.message}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                  <Button
+                    sx={{ marginTop: 2 }}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpenEditionDialog(true)}
+                  >
+                    Add Model edition
+                  </Button>
+                  <Dialog
+                    fullWidth
+                    open={openEditionDialog}
+                    onClose={() => setOpenEditionDialog(false)}
+                  >
+                    <DialogTitle>Add New Model Edition</DialogTitle>
+                    <DialogContent sx={("margin: 10px", "padding: 10px")}>
+                      <TextField
+                        fullWidth
+                        value={newEdition}
+                        onChange={(e) => setNewEdition(e.target.value)}
+                        label="Edition Name"
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        onClick={() => setOpenEditionDialog(false)}
+                        color="secondary"
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddEdition} color="primary">
+                        Add
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </Grid>
+                {/* <Grid item width={"100%"}>
+                  <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
+                    <InputLabel>Model version</InputLabel>
+                    <Select
+                      label="Model version"
+                      {...register("modelVersion", {
+                        required: "Model version is required",
+                      })}
+                      error={!!errors.model}
+                      value={getValues("modelVersion") || ""}
+                      onChange={(e) => {
+                        setValue("modelVersion", e.target.value);
+                        setSelectedModel(e.target.value);
+                      }}
+                      sx={{
+                        width: "100%",
+
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {models.map((model) => (
+                        <MenuItem
+                          sx={{
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                          }}
+                          key={model._id}
+                          value={model._id}
+                        >
+                          {model.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+
+                    {errors.model && (
+                      <FormHelperText error>
+                        {errors.model.message}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                  <Button
+                    sx={{ marginTop: 2 }}
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setOpenDialog(true)}
+                  >
+                    Add Model version
+                  </Button>
+                  <Dialog
+                    fullWidth
+                    open={openDialog}
+                    onClose={() => setOpenDialog(false)}
+                  >
+                    <DialogTitle>Add New Version</DialogTitle>
+                    <DialogContent sx={("margin: 10px", "padding: 10px")}>
+                      <TextField
+                        fullWidth
+                        value={newModel}
+                        onChange={(e) => setNewModel(e.target.value)}
+                        label="Version Name"
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button
+                        onClick={() => setOpenDialog(false)}
+                        color="secondary"
+                      >
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddModel} color="primary">
+                        Add
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
+                </Grid> */}
               </Grid>
 
               <Grid item width={"100%"}>

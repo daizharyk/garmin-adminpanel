@@ -39,6 +39,7 @@ const ArticleList = ({
               price={article.price}
               status={article.status}
               model={article.model}
+              model_edition={article.model_edition}
               color={article.color}
               banner_title={article.banner_title}
               banner_text={article.banner_text}
