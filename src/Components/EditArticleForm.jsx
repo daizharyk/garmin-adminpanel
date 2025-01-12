@@ -210,6 +210,7 @@ const EditArticleForm = ({ onClose, article }) => {
       formData.append("video_url", data.video_section.video_url);
       formData.append("model", data.model);
       formData.append("model_edition", data.model_edition);
+
       for (const [key, value] of Object.entries(features)) {
         formData.append(`features[${key}]`, value);
       }
@@ -272,6 +273,9 @@ const EditArticleForm = ({ onClose, article }) => {
 
     fetchData();
   }, [article?.model, setValue]);
+  useEffect(() => {
+    console.log("Updated model editions:", modelEditions);
+  }, [modelEditions]);
 
   const handleModelChange = async (modelId) => {
     setSelectedModel(modelId);
@@ -283,8 +287,8 @@ const EditArticleForm = ({ onClose, article }) => {
   };
   const handleEditionChange = (e) => {
     const selectedEdition = e.target.value;
-    setValue("model_edition", selectedEdition);
     setSelectedEdition(selectedEdition);
+    setValue("model_edition", selectedEdition);
   };
 
   const handleAddModel = async () => {
@@ -292,6 +296,10 @@ const EditArticleForm = ({ onClose, article }) => {
       const addedModel = await creatSmartwatchModel(newModel.trim());
 
       setModels((prevModels) => [...prevModels, addedModel]);
+      setSelectedModel(addedModel._id);
+      setValue("model", addedModel._id);
+      setModelEditions(addedModel.editions || []);
+
       setNewModel("");
       setOpenDialog(false);
     }
@@ -304,8 +312,18 @@ const EditArticleForm = ({ onClose, article }) => {
           selectedModel,
           newEdition.trim()
         );
-        setModelEditions((prevEditions) => [...prevEditions, addedEdition]),
-  
+        console.log("Перед добавлением:", modelEditions);
+        console.log("Добавленное издание:", addedEdition);
+        setModelEditions((prevEditions) => {
+          const updatedEditions = [
+            ...(Array.isArray(prevEditions) ? prevEditions : []),
+            addedEdition,
+          ];
+          console.log("Обновленное состояние modelEditions:", updatedEditions);
+          return updatedEditions;
+        });
+        setSelectedEdition(addedEdition._id);
+        setValue("model_edition", addedEdition._id);
         setNewEdition("");
         setOpenEditionDialog(false);
       } catch (error) {
@@ -494,7 +512,7 @@ const EditArticleForm = ({ onClose, article }) => {
                       value={getValues("model") || ""}
                       onChange={(e) => {
                         handleModelChange(e.target.value);
-                        // setValue("model", e.target.value);
+                      
                       }}
                       sx={{
                         width: "100%",
@@ -580,6 +598,7 @@ const EditArticleForm = ({ onClose, article }) => {
                         getValues("model_edition") || selectedEdition || ""
                       }
                       onChange={handleEditionChange}
+                      disabled={!selectedModel} 
                       sx={{
                         width: "100%",
 
@@ -613,6 +632,7 @@ const EditArticleForm = ({ onClose, article }) => {
                     variant="contained"
                     color="primary"
                     onClick={() => setOpenEditionDialog(true)}
+                    disabled={!selectedModel} 
                   >
                     Add Model edition
                   </Button>
