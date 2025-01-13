@@ -15,16 +15,13 @@ export async function creatSmartwatchModel(modelName) {
   return smartwatchModels;
 }
 export async function creatModelEdition(modelId, editionName) {
-  console.log("Отправка запроса на создание издания:", {
-    modelId,
-    name: editionName,
-  });
+
 
   const creatEdition = await postRequest(`${API_URL}/models/edition`, {
     modelId,
     name: editionName,
   });
-  console.log("creatEdition", creatEdition);
+
   return creatEdition;
 }
 export async function creatModelVersion(modelId, versionName) {

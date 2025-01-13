@@ -28,8 +28,8 @@ import ImageCarouselUploader from "./ImageCarouselUploader";
 import AddImageBtn from "./AddImageBtn";
 import {
   creatModelEdition,
+  creatModelVersion,
   creatSmartwatchModel,
-  getEditionsByModelId,
   getModelById,
   getSmartwatchModels,
 } from "../services/smartWatchService";
@@ -61,15 +61,7 @@ const EditArticleForm = ({ onClose, article }) => {
   const [openEditionDialog, setOpenEditionDialog] = useState(false);
   const [mainImage, setMainImage] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
-
-  // useEffect(() => {
-  //   console.log("Dialog state updated:", openDialog);
-  // }, [openDialog]); // Логируется каждый раз, когда состояние openDialog меняется
-
-  useEffect(() => {
-    console.log("setOpenDialog state updated:", setOpenDialog);
-  }, [setOpenDialog]); // Логируется каждый раз, когда состояние openDialog меняется
-
+  const [openVersionDialog, setOpenVersionDialog] = useState(false);
   const [watchFeatures, setWatchFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
   const [models, setModels] = useState([]);
@@ -78,17 +70,22 @@ const EditArticleForm = ({ onClose, article }) => {
   const [modelEditions, setModelEditions] = useState([]);
   const [selectedEdition, setSelectedEdition] = useState("");
   const [newEdition, setNewEdition] = useState("");
-  console.log("models", models);
+  const [modelVersions, setModelVersions] = useState([]);
+  const [selectedVersion, setSelectedVersion] = useState("");
+  const [newVersion, setNewVersion] = useState("");
+  console.log("modelVersions", modelVersions);
+  console.log("modelEditions", modelEditions);
 
   const [features, setFeatures] = useState({
     touchscreen: false,
+    solar_charging: false,
+    music_storage_on_watch: false,
     new_forerunners: false,
     entry_level_running: false,
     advanced_running: false,
     elite_running: false,
     touchscreen_and_buttons: false,
     color_screen: false,
-    solar_charging: false,
     flashlight: false,
     buttons: false,
     amoled_display: false,
@@ -106,6 +103,7 @@ const EditArticleForm = ({ onClose, article }) => {
       setValue("text", article.text || "");
       setValue("category", article.category || "");
       setValue("product_title", article.product_title || "");
+      setValue("case_size", article.case_size || "");
 
       if (article.image) {
         setMainImage(article.image || null);
@@ -144,6 +142,8 @@ const EditArticleForm = ({ onClose, article }) => {
 
       setFeatures({
         touchscreen: article.features?.touchscreen || false,
+        music_storage_on_watch:
+          article.features?.music_storage_on_watch || false,
         new_forerunners: article.features?.new_forerunners || false,
         entry_level_running: article.features?.entry_level_running || false,
         advanced_running: article.features?.advanced_running || false,
@@ -168,7 +168,7 @@ const EditArticleForm = ({ onClose, article }) => {
       if (carouselImages && Array.isArray(carouselImages)) {
         carouselImages.forEach((file) => {
           if (file && file.file instanceof Blob) {
-            formData.append("carouselImages", file.file); // Каждый файл в массив
+            formData.append("carouselImages", file.file);
           }
         });
       }
@@ -210,6 +210,8 @@ const EditArticleForm = ({ onClose, article }) => {
       formData.append("video_url", data.video_section.video_url);
       formData.append("model", data.model);
       formData.append("model_edition", data.model_edition);
+      formData.append("model_version", data.model_version);
+      formData.append("case_size", data.case_size);
 
       for (const [key, value] of Object.entries(features)) {
         formData.append(`features[${key}]`, value);
@@ -228,7 +230,7 @@ const EditArticleForm = ({ onClose, article }) => {
           }
         });
       }
-      console.log("FormData entries:");
+
       for (let pair of formData.entries()) {
         console.log(`${pair[0]}: ${pair[1]}`);
       }
@@ -261,9 +263,12 @@ const EditArticleForm = ({ onClose, article }) => {
           setSelectedModel(modelData._id);
           setValue("model", modelData._id || "");
           setModelEditions(modelData.editions || []);
+          setModelVersions(modelData.versions || []);
           if (article.model_edition) {
-            setSelectedEdition(article.model_edition);
             setValue("model_edition", article.model_edition);
+          }
+          if (article.model_version) {
+            setValue("model_version", article.model_version);
           }
         }
       } catch (error) {
@@ -274,21 +279,28 @@ const EditArticleForm = ({ onClose, article }) => {
     fetchData();
   }, [article?.model, setValue]);
   useEffect(() => {
-    console.log("Updated model editions:", modelEditions);
-  }, [modelEditions]);
+    console.log("Updated model versions:", modelVersions);
+  }, [modelVersions]);
 
   const handleModelChange = async (modelId) => {
     setSelectedModel(modelId);
     setValue("model", modelId);
     const selectedModel = models.find((model) => model._id === modelId);
+
     if (selectedModel) {
       setModelEditions(selectedModel.editions);
+      setModelVersions(selectedModel.versions);
     }
   };
   const handleEditionChange = (e) => {
     const selectedEdition = e.target.value;
     setSelectedEdition(selectedEdition);
     setValue("model_edition", selectedEdition);
+  };
+  const handleVersionChange = (e) => {
+    const selectedVersion = e.target.value;
+    setSelectedVersion(selectedVersion);
+    setValue("model_version", selectedVersion);
   };
 
   const handleAddModel = async () => {
@@ -326,6 +338,33 @@ const EditArticleForm = ({ onClose, article }) => {
         setValue("model_edition", addedEdition._id);
         setNewEdition("");
         setOpenEditionDialog(false);
+      } catch (error) {
+        console.error("Ошибка при добавлении нового издания:", error);
+      }
+    }
+  };
+
+  const handleAddVersion = async () => {
+    if (newVersion.trim() && selectedModel) {
+      try {
+        const addedVersion = await creatModelVersion(
+          selectedModel,
+          newVersion.trim()
+        );
+        console.log("Перед добавлением:", modelVersions);
+        console.log("Добавленное издание:", addedVersion);
+        setModelVersions((prevEditions) => {
+          const updatedVersion = [
+            ...(Array.isArray(prevEditions) ? prevEditions : []),
+            addedVersion,
+          ];
+          console.log("Обновленное состояние addedVersion:", addedVersion);
+          return updatedVersion;
+        });
+        setSelectedVersion(addedVersion._id);
+        setValue("model_version", addedVersion._id);
+        setNewVersion("");
+        setOpenVersionDialog(false);
       } catch (error) {
         console.error("Ошибка при добавлении нового издания:", error);
       }
@@ -512,7 +551,6 @@ const EditArticleForm = ({ onClose, article }) => {
                       value={getValues("model") || ""}
                       onChange={(e) => {
                         handleModelChange(e.target.value);
-                      
                       }}
                       sx={{
                         width: "100%",
@@ -521,6 +559,9 @@ const EditArticleForm = ({ onClose, article }) => {
                         overflow: "hidden",
                       }}
                     >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
                       {models.map((model) => (
                         <MenuItem
                           sx={{
@@ -598,7 +639,7 @@ const EditArticleForm = ({ onClose, article }) => {
                         getValues("model_edition") || selectedEdition || ""
                       }
                       onChange={handleEditionChange}
-                      disabled={!selectedModel} 
+                      disabled={!selectedModel}
                       sx={{
                         width: "100%",
 
@@ -607,6 +648,9 @@ const EditArticleForm = ({ onClose, article }) => {
                         overflow: "hidden",
                       }}
                     >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
                       {(modelEditions || []).map((edition) => (
                         <MenuItem
                           sx={{
@@ -632,7 +676,7 @@ const EditArticleForm = ({ onClose, article }) => {
                     variant="contained"
                     color="primary"
                     onClick={() => setOpenEditionDialog(true)}
-                    disabled={!selectedModel} 
+                    disabled={!selectedModel}
                   >
                     Add Model edition
                   </Button>
@@ -663,20 +707,21 @@ const EditArticleForm = ({ onClose, article }) => {
                     </DialogActions>
                   </Dialog>
                 </Grid>
-                {/* <Grid item width={"100%"}>
+                <Grid item width={"100%"}>
                   <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
                     <InputLabel>Model version</InputLabel>
                     <Select
                       label="Model version"
-                      {...register("modelVersion", {
-                        required: "Model version is required",
-                      })}
-                      error={!!errors.model}
-                      value={getValues("modelVersion") || ""}
-                      onChange={(e) => {
-                        setValue("modelVersion", e.target.value);
-                        setSelectedModel(e.target.value);
-                      }}
+                      {...register("model_version")}
+                      error={!!errors.model_version}
+                      value={(() => {
+                        const value =
+                          getValues("model_version") || selectedVersion || "";
+                        console.log("Model Version Value:", value);
+                        return value;
+                      })()}
+                      onChange={handleVersionChange}
+                      disabled={!selectedModel}
                       sx={{
                         width: "100%",
 
@@ -685,24 +730,27 @@ const EditArticleForm = ({ onClose, article }) => {
                         overflow: "hidden",
                       }}
                     >
-                      {models.map((model) => (
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      {(modelVersions || []).map((version) => (
                         <MenuItem
                           sx={{
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
                             overflow: "hidden",
                           }}
-                          key={model._id}
-                          value={model._id}
+                          key={version._id}
+                          value={version._id}
                         >
-                          {model.name}
+                          {version.name}
                         </MenuItem>
                       ))}
                     </Select>
 
-                    {errors.model && (
+                    {errors.version && (
                       <FormHelperText error>
-                        {errors.model.message}
+                        {errors.version.message}
                       </FormHelperText>
                     )}
                   </FormControl>
@@ -710,37 +758,67 @@ const EditArticleForm = ({ onClose, article }) => {
                     sx={{ marginTop: 2 }}
                     variant="contained"
                     color="primary"
-                    onClick={() => setOpenDialog(true)}
+                    onClick={() => setOpenVersionDialog(true)}
+                    disabled={!selectedModel}
                   >
                     Add Model version
                   </Button>
                   <Dialog
                     fullWidth
-                    open={openDialog}
-                    onClose={() => setOpenDialog(false)}
+                    open={openVersionDialog}
+                    onClose={() => setOpenVersionDialog(false)}
                   >
                     <DialogTitle>Add New Version</DialogTitle>
                     <DialogContent sx={("margin: 10px", "padding: 10px")}>
                       <TextField
                         fullWidth
-                        value={newModel}
-                        onChange={(e) => setNewModel(e.target.value)}
+                        value={newVersion}
+                        onChange={(e) => setNewVersion(e.target.value)}
                         label="Version Name"
                       />
                     </DialogContent>
                     <DialogActions>
                       <Button
-                        onClick={() => setOpenDialog(false)}
+                        onClick={() => setOpenVersionDialog(false)}
                         color="secondary"
                       >
                         Cancel
                       </Button>
-                      <Button onClick={handleAddModel} color="primary">
+                      <Button onClick={handleAddVersion} color="primary">
                         Add
                       </Button>
                     </DialogActions>
                   </Dialog>
-                </Grid> */}
+                </Grid>
+                <Grid item width={"100%"}>
+                  <FormControl fullWidth sx={{ backgroundColor: "#fff" }}>
+                    <InputLabel>Case size</InputLabel>
+                    <Select
+                      label="case_size"
+                      {...register("case_size")}
+                      error={!!errors.case_size}
+                      defaultValue={article?.case_size || ""}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      <MenuItem value="41">41</MenuItem>
+                      <MenuItem value="42">42</MenuItem>
+                      <MenuItem value="43">43</MenuItem>
+                      <MenuItem value="45">45</MenuItem>
+                      <MenuItem value="46">46</MenuItem>
+                      <MenuItem value="47">47</MenuItem>
+                      <MenuItem value="50">50</MenuItem>
+                      <MenuItem value="51">51</MenuItem>
+                    </Select>
+
+                    {errors.case_size && (
+                      <FormHelperText error>
+                        {errors.case_size.message}
+                      </FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
               </Grid>
 
               <Grid item width={"100%"}>
@@ -856,6 +934,7 @@ const EditArticleForm = ({ onClose, article }) => {
               </Grid>
             </Grid>
           </Grid>
+
           <Grid
             item
             sx={{
