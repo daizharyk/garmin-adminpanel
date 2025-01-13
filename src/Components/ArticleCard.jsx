@@ -29,9 +29,9 @@ const ArticleCard = memo(
     model_edition,
     model_version,
     case_size,
-    banner_title,
+
     banner_text,
-    video_url,
+
     watch_features,
     video_section,
     additional_images,
@@ -270,9 +270,9 @@ const ArticleCard = memo(
               features,
               status,
               color,
-              banner_title,
+        
               banner_text,
-              video_url,
+
               watch_features,
               video_section,
               additional_images,

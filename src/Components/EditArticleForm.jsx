@@ -43,7 +43,12 @@ const EditArticleForm = ({ onClose, article }) => {
     formState: { errors },
     setValue,
     getValues,
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      model_edition: "",
+      model_version: "",
+    },
+  });
 
   const [previewImage, setPreviewImage] = useState(null);
   const [carouselImages, setCarouselImages] = useState([]);
