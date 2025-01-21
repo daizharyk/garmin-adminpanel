@@ -78,8 +78,6 @@ const EditArticleForm = ({ onClose, article }) => {
   const [modelVersions, setModelVersions] = useState([]);
   const [selectedVersion, setSelectedVersion] = useState("");
   const [newVersion, setNewVersion] = useState("");
-  console.log("modelVersions", modelVersions);
-  console.log("modelEditions", modelEditions);
 
   const [features, setFeatures] = useState({
     touchscreen: false,
