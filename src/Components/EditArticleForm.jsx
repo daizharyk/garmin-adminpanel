@@ -1138,7 +1138,29 @@ const EditArticleForm = ({ onClose, article }) => {
                 buttonText={
                   videoSection?.thumbnail
                     ? "Change Cover"
-                    : "Upload player cover"
+                    : "Upload player cover(full)"
+                }
+              />
+            </Grid>
+            <Grid item xs={12} display={"flex"} justifyContent={"center"}>
+              <AddImageBtn
+                register={register}
+                onFileChange={handleVideoThumbnailChange}
+                previewImage={
+                  videoSection.thumbnail instanceof Blob
+                    ? URL.createObjectURL(videoSection.thumbnail)
+                    : videoSection.thumbnail || ""
+                }
+                fileKey="thumbnail"
+                containerStyle={{ width: "100%" }}
+                buttonStyle={{
+                  width: "100%",
+                  height: videoSection?.thumbnail ? "60px" : "150px",
+                }}
+                buttonText={
+                  videoSection?.thumbnail
+                    ? "Change Cover"
+                    : "Upload player cover(Mobile)"
                 }
               />
             </Grid>
