@@ -70,7 +70,7 @@ const Login = () => {
                   justifyContent: "space-between",
                   alignItems: "center",
                   border: "0.5px solid #fcb9b2",
-                  borderRadius: "4px", // Добавил скругленные углы
+                  borderRadius: "4px", 
                   padding: "15px",
                   boxShadow: "none",
                 }}
@@ -97,7 +97,7 @@ const Login = () => {
               helperText={errors.email?.message}
               InputProps={{
                 sx: {
-                  borderRadius: "4px", // Скругление углов
+                  borderRadius: "4px", 
                 },
               }}
             />
@@ -114,7 +114,7 @@ const Login = () => {
               helperText={errors.password?.message}
               InputProps={{
                 sx: {
-                  borderRadius: "4px", // Скругление углов
+                  borderRadius: "4px", 
                 },
               }}
             />

@@ -11,7 +11,6 @@ import NotFound from "./Pages/NotFound";
 import MyArticles from "./Pages/MyArticles";
 import Profile from "./Pages/Profile";
 import Article from "./Pages/Article";
-import DeletedArticles from "./Components/DeletedArticles";
 
 const protectedRoutes = [
   {

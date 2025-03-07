@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import PageWrapper from "../Common/PageWrapper";
-import { Box, Grid, Grow, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getMyArticleById } from "../store/slices/articlesSlice";
