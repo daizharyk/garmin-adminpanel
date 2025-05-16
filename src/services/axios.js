@@ -12,5 +12,15 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-
+instance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
+      window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);
 export default instance;
